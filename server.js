@@ -33,6 +33,8 @@ const server = http.createServer((req, res) => {
     const type = TYPES[path.extname(file).toLowerCase()] || 'application/octet-stream';
     // the page and dealer always come fresh, so players get your latest version
     const cache = /\.(html|js|webmanifest)$/.test(file) ? 'no-cache' : 'public, max-age=86400';
+    // tell the game page that this server runs the friends tables
+    if (rel === 'index.html') data = Buffer.from(data.toString('utf8').replace('<meta name="gs-server" content="">', '<meta name="gs-server" content="same">'));
     res.writeHead(200, { 'Content-Type': type, 'Cache-Control': cache });
     res.end(data);
   });

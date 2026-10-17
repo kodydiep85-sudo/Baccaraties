@@ -15,9 +15,11 @@ const TIERS = {
   high:    { name: 'High Limit',   min: 25,   max: 5000,   sideMin: 5 },
   vip:     { name: 'VIP Salon',    min: 100,  max: 25000,  sideMin: 50 },
   private: { name: 'Private Room', min: 1000, max: 100000, sideMin: 100 },
-  diamond: { name: 'Diamond Room', min: 10000, max: 1000000000, sideMin: 100, pairMin: 100 },
+  diamond: { name: 'Diamond Room', min: 10000, max: 1000000000000, sideMin: 100, pairMin: 100 },
 };
-const MAX_BANKROLL = 1e15;   // effectively no ceiling on a player's chips
+const MAX_BANKROLL = 1e15;
+// limits without a wall of zeros: $25,000 · $1.5B · $1T
+const limitText = n => n >= 1e12 ? '$' + +(n / 1e12).toFixed(2) + 'T' : n >= 1e9 ? '$' + +(n / 1e9).toFixed(2) + 'B' : '$' + n.toLocaleString('en-US');   // effectively no ceiling on a player's chips
 const MAX_PLAYERS = 7;
 // a betting round lasts one minute; the deal comes the moment everyone is ready, and anyone not ready by then sits out
 const BET_WINDOW_MS = (typeof process !== 'undefined' && process.env && +process.env.BET_WINDOW_MS) || 60000;
@@ -132,7 +134,8 @@ function deal(room) {
   }
   const bettors = [...room.players.values()].filter(p => stake(p) > 0);
   if (!bettors.length) return;
-  if (room.shoe.length < 20) { room.shoe = freshShoe(); broadcast(room, { t: 'shuffle' }); }
+  // the shoe is finished: shuffle a fresh one automatically and start a new roadmap
+  if (room.shoe.length < 20) { room.shoe = freshShoe(); room.history = []; broadcast(room, { t: 'shuffle' }); }
   clearTimeout(room.countdown); room.countdown = null; room.countdownEnds = null;
   room.phase = 'dealing';
   for (const p of room.players.values()) p.ready = false;
@@ -215,7 +218,9 @@ function settle(room) {
     payouts[pl.id] = { gross, staked: stake(pl), bankerPush: dragon && (pl.bets.banker || 0) > 0, onPanda: (pl.bets.panda || 0) > 0, onDragon: (pl.bets.dragon || 0) > 0 };
     pl.balance += gross; pl.bets = {}; pl.ready = false;
   }
-  room.history.push(result); if (room.history.length > 200) room.history.splice(0, room.history.length - 200);
+  // the roadmap marks Panda 8 (A), Dragon 7 (D) and winning naturals: Player 8/9 (Q/R), Banker 8/9 (S/U)
+  const natural = P.length === 2 && B.length === 2 && ((result === 'P' && p >= 8) || (result === 'B' && b >= 8));
+  room.history.push(panda ? 'A' : dragon ? 'D' : natural ? (result === 'P' ? (p === 9 ? 'R' : 'Q') : (b === 9 ? 'U' : 'S')) : result); if (room.history.length > 200) room.history.splice(0, room.history.length - 200);
   room.phase = 'result';
   broadcast(room, { t: 'result', result, p, b, panda, dragon, nine7, pPair, bPair, payouts });
   room.round = null;
@@ -268,7 +273,7 @@ function handle(ws, msg) {
       for (const k of SPOTS) {
         const v = Math.floor(Number(msg.bets && msg.bets[k]) || 0);
         if (v <= 0) continue;
-        if (v > lim.max && !NO_MAX[k]) { send(ws, { t: 'error', msg: `${lim.name} maximum is $${lim.max.toLocaleString()} per spot.` }); return pushState(room); }
+        if (v > lim.max && !NO_MAX[k]) { send(ws, { t: 'error', msg: `${lim.name} maximum is ${limitText(lim.max)} per spot.` }); return pushState(room); }
         nb[k] = v;
       }
       if (nb.player && nb.banker) { send(ws, { t: 'error', msg: 'You can bet Player or Banker in a hand, not both.' }); return pushState(room); }

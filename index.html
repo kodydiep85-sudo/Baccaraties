@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<!-- Online table server. Leave empty when the server also hosts this page; set it (wss://…/ws) for the store apps. -->
+<!-- Online table server. server.js fills this in by itself when it hosts the page; set it (wss://…/ws) for other hosts and the store apps. -->
 <meta name="gs-server" content="">
 <meta name="theme-color" content="#140608">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -292,6 +292,17 @@ body:not(.online) .onlyOnline{display:none}body.online .onlySolo{display:none}
 .bead6{flex:none;width:calc((var(--cell) + 1px) * 6 + 1px)}
 .big6{flex:1;min-width:0;grid-auto-flow:row;grid-template-columns:repeat(var(--bcols,9),var(--cell));justify-content:start}
 .sbgrid i{display:grid;place-items:center;width:var(--cell);height:var(--cell);border-radius:50%;font:800 calc(var(--cell)*.55) system-ui,sans-serif;font-style:normal;color:#fff;position:relative}
+.sbgrid i.nat{box-shadow:inset 0 0 0 calc(var(--cell)*.12) #f2c230;color:#fff;font-weight:900}
+.big6 i.nat{box-shadow:0 0 0 calc(var(--cell)*.07) #f2c230;color:inherit}
+.big6 i.nat em{font:900 calc(var(--cell)*.52)/1 system-ui,sans-serif;font-style:normal}.big6 i.P.nat em{color:#1f5fd6}.big6 i.B.nat em{color:#d42a36}
+.dot.nat{box-shadow:inset 0 0 0 2px #f2c230}
+.sbc.nt b{color:#f2c230}
+.sbgrid i.ico{background:none!important;border:0!important;width:var(--cell);height:var(--cell);margin:0}
+.sbgrid i.ico svg{display:block;width:100%;height:100%}
+.big6 i.ico.tie::after{top:46%}
+.sbc.pd b{color:#3fd18a}.sbc.dg b{color:#f2c230}.sbc .mini-ico{display:inline-block;width:1.25em;height:1.25em;vertical-align:-.28em}
+.sbc .mini-ico svg{display:block;width:100%;height:100%}
+.dot.ico{background:none;width:16px;height:16px;padding:0}.dot.ico svg{display:block;width:100%;height:100%}
 .bead6 i.P,.beadx i.P{background:#1f5fd6}.bead6 i.B,.beadx i.B{background:#d42a36}.bead6 i.T,.beadx i.T{background:#1f9d5b}
 .big6 i{background:none;border:calc(var(--cell)*.16) solid;box-sizing:border-box;width:calc(var(--cell)*.86);height:calc(var(--cell)*.86);margin:auto}
 .big6 i.P{border-color:#1f5fd6}.big6 i.B{border-color:#d42a36}
@@ -331,7 +342,9 @@ body.rotated .deal{left:20%;right:25%}
  background:repeating-conic-gradient(#fff 0 15deg,var(--c) 15deg 30deg);box-shadow:0 4px 6px #0009}
 .chipg::before{content:"";position:absolute;inset:18%;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 2px #ffffffaa}
 .chipg span{position:relative;font-size:.92rem;text-shadow:0 1px 2px #0008}
-button.chipg{width:50px;height:50px;transition:transform .12s}button.chipg.active{transform:translateY(-4px) scale(1.08);outline:3px solid #8ce6b2;outline-offset:2px}
+button.chipg{width:50px;height:50px;transition:transform .12s}
+/* rooms with a lot of chips (Diamond Room): smaller chips, five across */
+.chips.many{gap:7px 6px}.chips.many button.chipg{width:40px;height:40px}.chips.many .chipg span{font-size:.72rem}button.chipg.active{transform:translateY(-4px) scale(1.08);outline:3px solid #8ce6b2;outline-offset:2px}
 
 /* ---------- dock ---------- */
 .dock{display:grid;grid-template-columns:1.1fr 1fr;gap:14px}
@@ -377,6 +390,8 @@ button.chipg{width:50px;height:50px;transition:transform .12s}button.chipg.activ
 .royal{position:absolute;left:21%;right:21%;top:8%;bottom:8%}.royal svg{display:block;width:100%;height:100%}
 .card.down .idx{display:none}
 .card.down.opp{cursor:pointer}.card.down.opp .face{animation:oppGlow 1.8s ease-in-out infinite}
+.card.sealed::after{content:"OPENED";position:absolute;left:50%;bottom:-.9em;transform:translateX(-50%);z-index:3;padding:.15em .6em;border-radius:1em;
+ font:800 .62em system-ui,sans-serif;letter-spacing:.12em;color:#2a1405;background:#f0c64e;box-shadow:0 2px 4px #0008;white-space:nowrap}
 @keyframes oppGlow{50%{box-shadow:0 0 0 3px #ffffffcc,0 0 12px #fff8,0 4px 10px #001b12b0}}
 
 @media(max-width:900px){body:not(.rotated) .stage{flex-direction:column;gap:10px}
@@ -485,6 +500,20 @@ body.rotated .lcard .sub{margin-bottom:8px}
  body:not(.rotated) .scoreboard{display:none}
  body:not(.rotated) .roadbtn{display:inline-block}
 }
+/* ---------- bankroll pop-up before you sit down ---------- */
+.buycard{width:min(100%,430px);text-align:center;color:#e8e2d0}
+.buyq{margin:4px 0 6px;font:700 1rem Georgia,serif;color:#f6dcc0}
+.buyamt{font:800 2.4rem system-ui,sans-serif;color:#9cf0b8;font-variant-numeric:tabular-nums;margin:2px 0 8px}
+.buycard input[type=range]{width:100%;accent-color:#f0c64e}
+.buycard .presets{display:flex;gap:6px;margin-top:10px}.buycard .presets button{flex:1;padding:8px 2px;border-radius:8px;font:700 .8rem system-ui;color:#fff;background:#2a1418;border:1px solid #6a3a42;cursor:pointer}
+.buycard .presets button.on{background:#5a3a10;border-color:#f0c64e;color:#ffe9a8}
+.buynote{min-height:1.2em;margin:10px 0 0;font-size:.8rem;color:#c9b79a}
+.buygo,.buykeep{display:block;width:100%;margin-top:10px;padding:13px;border-radius:10px;font:700 .95rem Georgia,serif;letter-spacing:.1em;text-transform:uppercase;color:#fff;cursor:pointer}
+.buygo{background:linear-gradient(#ea3a48,#a3121f);border:1px solid #ff8a92;box-shadow:0 0 14px #e23a4855}
+.buykeep{background:linear-gradient(#7d1a26,#4a0b14);border:1px solid #a8434f}
+/* your name and chips */
+.whoami{margin:6px 0 0;text-align:left;font:700 .82rem system-ui,sans-serif;color:#f6dcc0}.whoami b{color:#9cf0b8}
+.bstat .mename{font:700 .95rem Georgia,serif;letter-spacing:.06em;color:var(--gold)}.bstat .mename:empty{display:none}
 /* ---------- Panda 8 and Dragon 7 celebrations (only for players who bet them) ---------- */
 .fx{position:fixed;inset:0;z-index:80;pointer-events:none;overflow:hidden;contain:strict}
 .fx[hidden]{display:none!important}
@@ -542,10 +571,22 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
 </div>
 <div class="roadmodal" id="roadModal" hidden>
  <div class="rmcard" role="dialog" aria-label="Scoreboard">
-  <div class="rmhead"><b>ROADMAP</b><span class="sbc p">PLAYER <b id="rmP">0</b></span><span class="sbc b">BANKER <b id="rmB">0</b></span><span class="sbc t">TIE <b id="rmT">0</b></span><span class="rmhands" id="rmHands"></span><button id="rmClose">Close</button></div>
+  <div class="rmhead"><b>ROADMAP</b><span class="sbc p">PLAYER <b id="rmP">0</b></span><span class="sbc b">BANKER <b id="rmB">0</b></span><span class="sbc t">TIE <b id="rmT">0</b></span><span class="sbc pd"><i class="mini-ico" data-ico="A"></i> PANDA 8 <b id="rmA">0</b></span><span class="sbc dg"><i class="mini-ico" data-ico="D"></i> DRAGON 7 <b id="rmD">0</b></span><span class="sbc nt">NATURALS <b id="rmN">0</b></span><span class="rmhands" id="rmHands"></span><button id="rmClose">Close</button></div>
   <div class="rmlabel">BIG ROAD</div><div class="sbgrid big6 rmbig" id="rmBig"></div>
   <div class="rmlabel">BEAD PLATE</div><div class="sbgrid beadx" id="rmBead"></div>
   <p class="rmnote">Big Road: a new column each time the winner changes; a green slash is a tie. Bead plate: every hand in order, top to bottom.</p>
+ </div>
+</div>
+<div class="roadmodal" id="buyModal" hidden>
+ <div class="rmcard buycard" role="dialog" aria-modal="true" aria-labelledby="buyTitle">
+  <div class="rmhead"><b id="buyTitle">YOUR BANKROLL</b><span class="rmhands" id="buyWho"></span><button id="buyClose">Cancel</button></div>
+  <p class="buyq">How much do you want to play with?</p>
+  <div class="buyamt" id="buyAmt">$5,000</div>
+  <input type="range" id="buyRange" min="0" max="1000" step="1" aria-label="Bankroll amount">
+  <div class="presets" id="buyPresets"><button data-buy="1000">$1K</button><button data-buy="5000">$5K</button><button data-buy="10000">$10K</button><button data-buy="100000">$100K</button><button data-buy="1000000">$1M</button><button data-buy="10000000">$10M</button></div>
+  <p class="buynote" id="buyNote"></p>
+  <button class="buygo" id="buyGo">Sit down with $5,000</button>
+  <button class="buykeep" id="buyKeep">Keep my $5,000</button>
  </div>
 </div>
 <div class="lobby" id="lobby">
@@ -557,14 +598,16 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
    <input type="range" id="startRange" min="0" max="1000" step="1" value="341" aria-describedby="startVal">
    <div class="presets"><button data-amt="1000">$1K</button><button data-amt="5000">$5K</button><button data-amt="10000">$10K</button><button data-amt="100000">$100K</button><button data-amt="1000000">$1M</button><button data-amt="10000000">$10M</button></div>
    <button class="big" id="startSet">Start with $5,000</button>
-   <p class="snote">Tops you up to this amount. Chips you've won are never taken away.</p>
+   <p class="snote">Sets your chips to exactly this amount. Virtual chips only.</p>
   </div>
   <label for="nameIn">Your name</label><input id="nameIn" maxlength="14" placeholder="Player" autocomplete="nickname">
+  <div class="whoami" id="whoAmI"></div>
   <label>Choose a table</label><div class="tiers" id="tiers"></div>
   <button class="big" id="createBtn">Start this table with friends</button>
   <label class="chk"><input type="checkbox" id="openChk" checked> List my table so anyone can join</label>
   <button id="soloBtn">Play this table solo</button>
   <p class="livenote" id="liveNote" hidden></p>
+  <button class="big" id="rejoinBtn" hidden>Rejoin your table</button>
   <div class="or">— OR JOIN A FRIEND'S TABLE —</div>
   <div class="row"><input id="codeIn" maxlength="4" placeholder="CODE" autocomplete="off" autocapitalize="characters"><button id="joinBtn">Join</button></div>
   <div class="tables" id="openTables" hidden><div class="or">— OPEN TABLES —</div><div id="tableList"></div></div>
@@ -653,7 +696,7 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
 
   <div class="logo l"><b>Grand Squeeze</b><small>♠ BACCARAT ♠</small></div>
   <div class="scoreboard" id="scoreboard" role="button" tabindex="0" aria-label="Results scoreboard — tap to enlarge">
-   <div class="sbhead"><span class="sbt">ROADMAP <em class="sbx">⤢</em></span><span class="sbc p">P <b id="sbP">0</b></span><span class="sbc b">B <b id="sbB">0</b></span><span class="sbc t">T <b id="sbT">0</b></span></div>
+   <div class="sbhead"><span class="sbt">ROADMAP <em class="sbx">⤢</em></span><span class="sbc p">P <b id="sbP">0</b></span><span class="sbc b">B <b id="sbB">0</b></span><span class="sbc t">T <b id="sbT">0</b></span><span class="sbc pd" title="Panda 8 this shoe"><i class="mini-ico" data-ico="A"></i><b id="sbA">0</b></span><span class="sbc dg" title="Dragon 7 this shoe"><i class="mini-ico" data-ico="D"></i><b id="sbD">0</b></span></div>
    <div class="sbroads"><div class="sbgrid bead6" id="sbBead"></div><div class="sbgrid big6" id="sbBig"></div></div>
    <div class="sbfoot"><span>BEAD PLATE</span><span>BIG ROAD</span><span id="sbShoe">416 cards</span></div>
   </div>
@@ -677,7 +720,7 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
    <button class="leave" id="leaveBtn">Leave table</button>
   </div>
  <div class="bar">
-  <div class="bstat"><span class="bal" id="balance">$5,000.00</span><span class="meta">Bet <b id="totalBet">$0</b> · <span id="profitAmt" class="profit"></span> · <span id="phase">Place your bets</span></span></div>
+  <div class="bstat"><span class="mename" id="meName"></span><span class="bal" id="balance">$5,000.00</span><span class="meta">Bet <b id="totalBet">$0</b> · <span id="profitAmt" class="profit"></span> · <span id="phase">Place your bets</span></span></div>
   <div class="chips" id="chips">
 
   </div>
@@ -703,14 +746,28 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
 <script>
 (() => {
  const $=id=>document.getElementById(id);
- const fmt=n=>'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+ // a billion and up is written short ($1.5B, $1T) so there isn't a wall of zeros
+ const big=n=>{const a=Math.abs(n),s=n<0?'-':'';return a>=1e12?s+'$'+(+(a/1e12).toFixed(2))+'T':s+'$'+(+(a/1e9).toFixed(2))+'B'};
+ const fmt=n=>Math.abs(n)>=1e9?big(n):'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+ const limit=n=>fmt(n).replace('.00','');
  const SUITS=[['♠','black'],['♥','red'],['♦','red'],['♣','black']];
  const RANKS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
  const PAYOUT={player:1,banker:1,tie:8,panda:25,dragon:40,nine7:25,ppair:11,bpair:11};
  const NAME={player:'Player',banker:'Banker',tie:'Tie',panda:'Panda 8',dragon:'Dragon 7',nine7:'9 over 7',ppair:'Player Pair',bpair:'Banker Pair'};
  // new players start with $5,000; anyone can pick their own starting amount up to $10,000,000
  const START_DEFAULT=5000,START_MIN=100,START_MAX=10000000;
- const startAmt=()=>{try{const n=Number(localStorage.getItem('gs.start'));return n>=START_MIN&&n<=START_MAX?n:START_DEFAULT}catch(e){return START_DEFAULT}};
+ // every player name keeps its own chips on this device, so two people (or two tabs) never share or swap a wallet
+ const slug=n=>String(n||'Player').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,20)||'player';
+ let walletName=(()=>{try{return sessionStorage.getItem('gs.me')||localStorage.getItem('gs.name')||'Player'}catch(e){return 'Player'}})();
+ // the single wallet saved before wallets were per name stays with the name that was in use then
+ const MIGRATED=(()=>{try{let m=localStorage.getItem('gs.migrated');if(!m){m=slug(localStorage.getItem('gs.name')||'Player');localStorage.setItem('gs.migrated',m)}return m}catch(e){return slug('Player')}})();
+ const keyOf=k=>'gs.'+k+'@'+slug(walletName);
+ const getK=k=>{try{const v=localStorage.getItem(keyOf(k));if(v!==null)return v;if(slug(walletName)!==MIGRATED)return null;
+  return localStorage.getItem('gs.'+k)??(k==='wallet'?localStorage.getItem('gs.balance'):null)}catch(e){return null}};
+ const setK=(k,v)=>{try{localStorage.setItem(keyOf(k),String(v))}catch(e){}};
+ // a name with no chips saved yet starts with the amount most recently picked on this device
+ const startAmt=()=>{let v=getK('start');if(v===null)try{v=localStorage.getItem('gs.lastStart')}catch(e){}
+  const n=Number(v);return v!==null&&n>=START_MIN&&n<=START_MAX?n:START_DEFAULT};
  let balance=START_DEFAULT,chip=5,bets={};
  // Table tiers: each has its own limits per spot, chip values and felt (must match TIERS in server/server.js)
  const TIERS={
@@ -718,7 +775,7 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
   high:   {name:'High Limit',  min:25,  max:5000,  sideMin:5,  chips:[25,50,100,500,1000,5000],         felt:'#0f6b45'},
   vip:    {name:'VIP Salon',   min:100, max:25000, sideMin:50, chips:[50,100,500,1000,5000,10000,25000],felt:'#1d3f86'},
   private:{name:'Private Room',min:1000,max:100000,sideMin:100,chips:[50,100,1000,5000,10000,25000],        felt:'#2a2a30'},
-  diamond:{name:'Diamond Room',min:10000,max:1000000000,sideMin:100,pairMin:100,chips:[100,500,1000,10000,50000,100000,500000,1000000,5000000,10000000,50000000,100000000],felt:'#3a1f5d'}};
+  diamond:{name:'Diamond Room',min:10000,max:1000000000000,sideMin:100,pairMin:100,chips:[100,500,100000,500000,1000000,5000000,10000000,50000000,100000000,500000000,1000000000,5000000000,10000000000,50000000000,100000000000,500000000000,1000000000000],felt:'#3a1f5d'}};
  let walletReady=false,pickedTier=(()=>{try{return localStorage.getItem('gs.tier')||'lounge'}catch(e){return 'lounge'}})();
  let tierId='lounge';const TIER=()=>TIERS[tierId];
  // Panda 8 and Dragon 7: each table's own minimum, no maximum (matches table-core.js)
@@ -1080,6 +1137,8 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
  }
  // online: the Player side is peeled first; Banker cards stay put until every Player card is open
  const waitTurn=c=>NET.on&&round&&c.side==='banker'&&round.deal.some(x=>x.side==='player'&&!x.up);
+ // online: cards another player squeezes stay face down for everyone else until the hand is paid
+ const hiddenFromMe=c=>NET.on&&round&&!round.settling&&round.squeezer&&!!round.squeezer[c.side]&&round.squeezer[c.side]!==NET.me;
  const zoneOn=()=>$('zone').classList.toggle('on',$('zoneCards').children.length>0);
  // the dealer slides every face-down card on your side over to you
  function giveCards(){
@@ -1248,14 +1307,15 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
   return c;
  }
  function updateScores(){
-  for(const side of ['player','banker']){const up=table[side].filter(c=>c.up);$(side+'Score').textContent=up.length?total(up):'—'}
+  for(const side of ['player','banker']){const up=table[side].filter(c=>c.up&&!c.sealed);
+   $(side+'Score').textContent=table[side].some(c=>c.sealed)?'?':up.length?total(up):'—'}
  }
 
  /* ---------- betting UI ---------- */
- const CHIPCOL=[[100000000,'#9e7b00'],[50000000,'#c2185b'],[10000000,'#1565c0'],[5000000,'#e65100'],[1000000,'#0a6b4a'],[500000,'#4a1d7a'],[100000,'#a3171f'],[50000,'#3d5a80'],[25000,'#d6338a'],[10000,'#168c8c'],[5000,'#8b5a2b'],[1000,'#d9a320'],[500,'#6b3fa0'],[100,'#23262e'],[50,'#e07a1f'],[25,'#1f8a54'],[10,'#2a62d1'],[0,'#c8323e']];
+ const CHIPCOL=[[1000000000000,'#111111'],[500000000000,'#c62828'],[100000000000,'#2e7d32'],[50000000000,'#ad1457'],[10000000000,'#1a237e'],[5000000000,'#00838f'],[1000000000,'#b8860b'],[500000000,'#6a1b9a'],[100000000,'#9e7b00'],[50000000,'#c2185b'],[10000000,'#1565c0'],[5000000,'#e65100'],[1000000,'#0a6b4a'],[500000,'#4a1d7a'],[100000,'#a3171f'],[50000,'#3d5a80'],[25000,'#d6338a'],[10000,'#168c8c'],[5000,'#8b5a2b'],[1000,'#d9a320'],[500,'#6b3fa0'],[100,'#23262e'],[50,'#e07a1f'],[25,'#1f8a54'],[10,'#2a62d1'],[0,'#c8323e']];
  const chipColor=a=>CHIPCOL.find(([v])=>a>=v)[1];
- const short=a=>a>=1e6?(a%1e6?(a/1e6).toFixed(1):a/1e6)+'M':a>=1000?(a%1000?(a/1000).toFixed(1):a/1000)+'K':'$'+a;
- const chipLabel=a=>a>=1e6?(a/1e6)+'M':a>=1000?(a/1000)+'K':String(a);
+ const short=a=>a>=1e12?+(a/1e12).toFixed(2)+'T':a>=1e9?+(a/1e9).toFixed(2)+'B':a>=1e6?(a%1e6?(a/1e6).toFixed(1):a/1e6)+'M':a>=1000?(a%1000?(a/1000).toFixed(1):a/1000)+'K':'$'+a;
+ const chipLabel=a=>a>=1e12?(a/1e12)+'T':a>=1e9?(a/1e9)+'B':a>=1e6?(a/1e6)+'M':a>=1000?(a/1000)+'K':String(a);
  const SEAT_FILL=[2,1,3,0,4];   // list position → seat slot (you first)
  function seatList(){if(!NET.on)return [{id:'me',name:'You',balance,bets}];const meP=NET.players.find(p=>p.id===NET.me);
   return [meP,...NET.players.filter(p=>p.id!==NET.me)].filter(Boolean).slice(0,5)}
@@ -1267,20 +1327,40 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
   $('betsLedger').innerHTML=ents.length?ents.map(([k,a])=>`${NAME[k]}: <b>${fmt(a)}</b>`).join('<br>'):'No bets placed.';
  }
  // ---- the scoreboard roads ----
+ // Panda 8 (a Player win) and Dragon 7 (a Banker win) get their own icons on the roadmap
+ const ICON={
+  A:`<svg viewBox="0 0 20 20" aria-label="Panda 8"><circle cx="10" cy="10" r="10" fill="#1f8a54"/><circle cx="4.9" cy="5.2" r="2.7" fill="#111"/><circle cx="15.1" cy="5.2" r="2.7" fill="#111"/>
+   <circle cx="10" cy="11" r="6.9" fill="#fff"/><ellipse cx="7.3" cy="10.3" rx="1.7" ry="2.3" transform="rotate(28 7.3 10.3)" fill="#111"/><ellipse cx="12.7" cy="10.3" rx="1.7" ry="2.3" transform="rotate(-28 12.7 10.3)" fill="#111"/>
+   <circle cx="7.6" cy="10" r=".6" fill="#fff"/><circle cx="12.4" cy="10" r=".6" fill="#fff"/><ellipse cx="10" cy="14" rx="1.4" ry="1" fill="#111"/></svg>`,
+  D:`<svg viewBox="0 0 20 20" aria-label="Dragon 7"><circle cx="10" cy="10" r="10" fill="#9e0f1a"/>
+   <path d="M5.4 6.4 3 6.9l1.7 1.2-2.3 1.5 2.1.6-1.9 1.9 2.4.2-1.2 2.1 2.6-.4" fill="#e8a317"/>
+   <path d="M8.2 5.3C7.4 3.4 5.8 2.5 3.9 2.7M10.3 4.9C10.3 3 9.6 1.9 8 1.4" fill="none" stroke="#f2c230" stroke-width="1.3" stroke-linecap="round"/>
+   <path d="M5.2 6.3C6.7 4.8 9 4.4 11.1 5l4.6 1.5c1 .4 1.7 1.2 1.9 2.3l-4.6 1 4 1.4c-1.2 1.5-3.2 2.2-5.3 1.9l-1.9 2.4-4.1-.9c-1-2.7-1.2-5.8-.4-8.3z" fill="#f2c230" stroke="#7a4a00" stroke-width=".45" stroke-linejoin="round"/>
+   <path d="M15.2 9.2l.4.9.4-1.1M14.4 11.4l.4-.8.4.9" fill="#fff"/>
+   <ellipse cx="11.2" cy="7.3" rx="1.25" ry=".95" fill="#fff"/><ellipse cx="11.35" cy="7.3" rx=".35" ry=".8" fill="#9e0f1a"/>
+   <circle cx="16.3" cy="7.9" r=".35" fill="#7a4a00"/>
+   <path d="M16.6 7.4c1.8-.9 2.3-2.4 1.8-3.6M15.9 12.4c1 1.5.8 2.9-.4 3.8" fill="none" stroke="#f2c230" stroke-width=".7" stroke-linecap="round"/></svg>`};
+ // winning naturals: Player 8 / 9 and Banker 8 / 9
+ const NAT={Q:['P',8],R:['P',9],S:['B',8],U:['B',9]};
+ const base=x=>x==='A'||NAT[x]&&NAT[x][0]==='P'?'P':x==='D'||NAT[x]&&NAT[x][0]==='B'?'B':x;
+ const beadCell=x=>ICON[x]?`<i class="${base(x)} ico" title="${x==='A'?'Panda 8':'Dragon 7'}">${ICON[x]}</i>`
+  :NAT[x]?`<i class="${NAT[x][0]} nat" title="${name(NAT[x][0]==='P'?'player':'banker')} natural ${NAT[x][1]}">${NAT[x][1]}</i>`:`<i class="${x}">${x}</i>`;
  function renderRoad(){
-  const h=history.filter(x=>x==='P'||x==='B'||x==='T');
+  const h=history.filter(x=>'PBTADQRSU'.includes(x));
   $('sbP').textContent=counts.P;$('sbB').textContent=counts.B;$('sbT').textContent=counts.T;
+  const nA=h.filter(x=>x==='A').length,nD=h.filter(x=>x==='D').length;$('sbA').textContent=nA;$('sbD').textContent=nD;
+  document.querySelectorAll('[data-ico]').forEach(el=>{if(!el.firstChild)el.innerHTML=ICON[el.dataset.ico]});
   const sh=(document.getElementById('shoeInfo')||{}).textContent||'',m=sh.match(/(\d+) cards/);$('sbShoe').textContent=m?m[1]+' CARDS':'';
   // bead plate: every hand in order, six to a column, newest columns on the right
-  const bead=h.slice(-36);$('sbBead').innerHTML=bead.map(x=>`<i class="${x}">${x}</i>`).join('');
+  const bead=h.slice(-36);$('sbBead').innerHTML=bead.map(beadCell).join('');
   // big road: a new column each time the winner changes, ties marked on the last circle, long streaks turn right
   const cells=new Map(),key=(c,r)=>c+','+r;let col=-1,row=0,last=null,lastCell=null,preTies=0,streakCol=-1;
-  for(const x of h){
+  for(const k of h){const x=base(k);
    if(x==='T'){if(lastCell)lastCell.t++;else preTies++;continue}
    if(x!==last){streakCol++;col=streakCol;row=0;while(cells.has(key(col,row)))col++;}
    else if(row<5&&!cells.has(key(col,row+1)))row++;
    else col++;
-   lastCell={x,t:preTies};preTies=0;cells.set(key(col,row),lastCell);last=x;
+   lastCell={x,k,t:preTies};preTies=0;cells.set(key(col,row),lastCell);last=x;
   }
   let maxCol=0;for(const k of cells.keys())maxCol=Math.max(maxCol,+k.split(',')[0]);
   // as many Big Road columns as fit beside the bead plate (one bead cell = one road cell)
@@ -1288,15 +1368,15 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
    const cols=unit>0?Math.max(6,Math.min(maxCols,Math.floor((box.getBoundingClientRect().width-1)/unit))):9;
    const first=Math.max(0,maxCol-cols+1);box.style.setProperty('--bcols',cols);
    let out='';for(let r=0;r<6;r++)for(let c=first;c<first+cols;c++){const v=cells.get(key(c,r));
-    out+=v?`<i class="${v.x}${v.t?' tie':''}">${v.t>1?`<b>${v.t}</b>`:''}</i>`:'<span></span>'}
+    out+=v?`<i class="${v.x}${v.t?' tie':''}${ICON[v.k]?' ico':NAT[v.k]?' nat':''}">${ICON[v.k]||(NAT[v.k]?`<em>${NAT[v.k][1]}</em>`:'')}${v.t>1?`<b>${v.t}</b>`:''}</i>`:'<span></span>'}
    box.innerHTML=out};
   drawBig($('sbBig'),($('sbBead').getBoundingClientRect().width-1)/6,30);
   // the enlarged board shows the whole shoe
   if(!$('roadModal').hidden){
-   $('rmP').textContent=counts.P;$('rmB').textContent=counts.B;$('rmT').textContent=counts.T;
+   $('rmP').textContent=counts.P;$('rmB').textContent=counts.B;$('rmT').textContent=counts.T;$('rmA').textContent=nA;$('rmD').textContent=nD;$('rmN').textContent=h.filter(x=>NAT[x]).length;
    $('rmHands').textContent=`${h.length} hand${h.length===1?'':'s'} this shoe · ${$('sbShoe').textContent.toLowerCase()}`;
    const all=h.slice(-180),cols=Math.max(12,Math.ceil(all.length/6));
-   const rb=$('rmBead');rb.style.gridTemplateColumns='';rb.innerHTML=all.map(x=>`<i class="${x}">${x}</i>`).join('')+'<span></span>'.repeat(cols*6-all.length);
+   const rb=$('rmBead');rb.style.gridTemplateColumns='';rb.innerHTML=all.map(beadCell).join('')+'<span></span>'.repeat(cols*6-all.length);
    const cell=parseFloat(getComputedStyle($('roadModal').querySelector('.rmcard')).getPropertyValue('--cell'))||22;
    drawBig($('rmBig'),cell+1,80);
   }
@@ -1305,54 +1385,59 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
  function closeRoad(){$('roadModal').hidden=true}
  function renderHistory(){
   renderRoad();
-  $('history').innerHTML=history.slice(-36).map(x=>`<span class="dot ${x}">${x}</span>`).join('');
+  $('history').innerHTML=history.slice(-36).map(x=>ICON[x]?`<span class="dot ico">${ICON[x]}</span>`:NAT[x]?`<span class="dot ${NAT[x][0]} nat">${NAT[x][1]}</span>`:`<span class="dot ${x}">${x}</span>`).join('');
   $('cP').textContent=counts.P;$('cB').textContent=counts.B;$('cT').textContent=counts.T;
  }
  const message=t=>{$('status').textContent=t};
  const hint=t=>{$('hint').textContent=t};
- function render(){$('balance').textContent=fmt(balance);renderBets();updateScores();renderHistory();renderSeats();
+ function render(){$('balance').textContent=fmt(balance);$('meName').textContent=$('lobby').hidden?myLabel():'';renderBets();updateScores();renderHistory();renderSeats();
   saveWallet();}
  // chips on the table still belong to you until the hand is decided, so they count toward the saved wallet
  // winnings from play, kept separately so topping up never erases them
- let profit=(()=>{try{return Number(localStorage.getItem('gs.profit'))||0}catch(e){return 0}})();
- function addProfit(n){profit+=n;try{localStorage.setItem('gs.profit',String(profit))}catch(e){}showProfit()}
+ let profit=Number(getK('profit'))||0;
+ function addProfit(n){profit+=n;setK('profit',profit);showProfit()}
  function showProfit(){const el=document.getElementById('profitAmt');if(!el)return;const sign=profit>=0?'+':'−';
   el.textContent=`Won ${sign}${fmt(Math.abs(profit)).replace('.00','')}`;el.classList.toggle('neg',profit<0);
   const w=document.getElementById('walletWon');if(w)w.textContent=`Lifetime winnings ${sign}${fmt(Math.abs(profit)).replace('.00','')}`}
  // the wallet has no ceiling: win as much as you like and it stays yours
  function saveWallet(){if(!walletReady)return;const w=Math.floor(balance+Object.values(bets).reduce((a,b)=>a+b,0));
-  let prev=null;try{prev=localStorage.getItem('gs.wallet');if(prev!==String(w)){localStorage.setItem('gs.wallet',String(w));localStorage.setItem('gs.walletAt',String(Date.now()))}}catch(e){}
+  if(getK('wallet')!==String(w)){setK('wallet',w);setK('walletAt',Date.now())}
   CLOUD.save(w)}
  /* On the claude.ai page, browser storage can be wiped between visits, which used to drop a big bankroll back to the
     starting chips. There the wallet is also kept in your own private save on claude.ai, so winnings follow you. */
- const CLOUD=(()=>{let ref=null,last=null,busy=false,again=false,timer=null;
-  const localAt=()=>{try{return Number(localStorage.getItem('gs.walletAt'))||0}catch(e){return 0}};
-  async function write(){if(!ref)return;if(busy){again=true;return}busy=true;
+ const CLOUD=(()=>{let ref=null,last=null,busy=false,again=false,timer=null,db=null,uid=null,bound=null;
+  const localAt=()=>Number(getK('walletAt'))||0;
+  async function write(){if(!ref)return;if(busy){again=true;return}busy=true;const r=ref;
    try{const w=Math.floor(balance+Object.values(bets).reduce((a,b)=>a+b,0));
-    if(w!==last){await ref.set({bank:w,start:startAmt(),profit,at:Date.now()});last=w}}catch(e){}
+    if(w!==last){await r.set({bank:w,start:startAmt(),profit,at:Date.now()});if(r===ref)last=w}}catch(e){}
    busy=false;if(again){again=false;write()}}
+  // load the private save for the name being played (each name has its own)
+  async function bind(){if(!db||!uid)return;const key=slug(walletName);if(bound===key)return;bound=key;ref=null;last=null;
+   try{const r=db.doc('data/users/'+uid+'/wallets/'+key);let snap=await r.get();
+    if(!snap.exists&&key===MIGRATED){const old=await db.doc('data/users/'+uid+'/wallet').get();if(old.exists)snap=old}
+    if(bound!==key)return;
+    const d=snap.exists?snap.data():null;
+    if(d&&Number.isFinite(Number(d.bank))&&Number(d.bank)>=0&&Number(d.at||0)>localAt()&&!round&&!NET.on&&!Object.values(bets).some(v=>v>0)){
+     balance=Number(d.bank);last=balance;
+     if(d.start)setK('start',d.start);if(Number.isFinite(Number(d.profit))){profit=Number(d.profit);setK('profit',profit)}
+     setK('wallet',balance);setK('walletAt',d.at);
+     ref=r;render();showProfit();if(typeof renderLobby==='function')renderLobby()}
+    else{ref=r;write()}}catch(e){}}
   (async()=>{try{if(!window.claude||!window.claude.use)return;
-   const [db,user]=await Promise.all([window.claude.use('db'),window.claude.use('user')]);if(!db||!user)return;
-   const id=await user.id();if(!id)return;const r=db.doc('data/users/'+id+'/wallet');const snap=await r.get();
-   const d=snap.exists?snap.data():null;
-   if(d&&Number.isFinite(Number(d.bank))&&Number(d.bank)>=0&&Number(d.at||0)>localAt()&&!round&&!NET.on&&!Object.values(bets).some(v=>v>0)){
-    balance=Number(d.bank);last=balance;
-    try{if(d.start)localStorage.setItem('gs.start',String(d.start));if(Number.isFinite(Number(d.profit))){profit=Number(d.profit);localStorage.setItem('gs.profit',String(profit))}
-     localStorage.setItem('gs.wallet',String(balance));localStorage.setItem('gs.walletAt',String(d.at))}catch(e){}
-    ref=r;render();showProfit();if(typeof renderLobby==='function')renderLobby()}
-   else{ref=r;write()}}catch(e){}})();
-  return {save(w){if(!ref||w===last)return;clearTimeout(timer);timer=setTimeout(write,1200)}}})();
- function loadWallet(){try{const w=localStorage.getItem('gs.wallet')??localStorage.getItem('gs.balance');const n=Number(w);return w!==null&&Number.isFinite(n)&&n>=0?n:startAmt()}catch(e){return startAmt()}}
+   const [d,user]=await Promise.all([window.claude.use('db'),window.claude.use('user')]);if(!d||!user)return;
+   uid=await user.id();if(!uid)return;db=d;bind()}catch(e){}})();
+  return {save(w){if(!ref||w===last)return;clearTimeout(timer);timer=setTimeout(write,1200)},bind}})();
+ function loadWallet(){const w=getK('wallet'),n=Number(w);return w!==null&&Number.isFinite(n)&&n>=0?n:startAmt()}
  const clearWins=()=>document.querySelectorAll('.spot.win').forEach(x=>x.classList.remove('win'));
  const clearYours=()=>document.querySelectorAll('.dside.mine').forEach(x=>x.classList.remove('mine'));
  // sit at a table tier: its felt, its limits sign and its chip values
  function setTier(id){
   tierId=TIERS[id]?id:'lounge';const t=TIER();
   document.documentElement.style.setProperty('--felt',t.felt);
-  $('plaqueName').textContent=t.name.toUpperCase();$('plaqueMin').textContent=fmt(t.min).replace('.00','');$('plaqueMax').textContent=fmt(t.max).replace('.00','');$('plaqueSide').textContent=fmt(t.sideMin).replace('.00','');$('plaquePair').hidden=!t.pairMin;if(t.pairMin)$('plaquePairMin').textContent=fmt(t.pairMin).replace('.00','');
+  $('plaqueName').textContent=t.name.toUpperCase();$('plaqueMin').textContent=fmt(t.min).replace('.00','');$('plaqueMax').textContent=limit(t.max);$('plaqueSide').textContent=fmt(t.sideMin).replace('.00','');$('plaquePair').hidden=!t.pairMin;if(t.pairMin)$('plaquePairMin').textContent=fmt(t.pairMin).replace('.00','');
   chip=t.chips.find(v=>v>=t.min)||t.chips[0];setTimeout(syncRepeat,0);
   if(typeof allInArmed!=='undefined'&&allInArmed)armAllIn(false);
-  $('chips').style.setProperty('--cols',t.chips.length>6?4:3);
+  $('chips').style.setProperty('--cols',t.chips.length>16?5:t.chips.length>6?4:3);$('chips').classList.toggle('many',t.chips.length>16);
   $('chips').innerHTML=t.chips.map(v=>`<button class="chipg${v===chip?' active':''}" style="--c:${chipColor(v)}" data-chip="${v}"><span>${chipLabel(v)}</span></button>`).join('');
   document.querySelectorAll('[data-chip]').forEach(b=>b.onclick=()=>{
    chip=+b.dataset.chip;SFX.pick();if(typeof armAllIn==='function'&&allInArmed)armAllIn(false);document.querySelectorAll('[data-chip]').forEach(x=>x.classList.toggle('active',x===b))});
@@ -1365,7 +1450,7 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
  function placeBet(k,allIn){
   const room=NO_MAX[k]?Infinity:TIER().max-(bets[k]||0),amt=allIn?Math.min(Math.floor(balance),room):chip;
   if((k==='player'&&bets.banker>0)||(k==='banker'&&bets.player>0)){SFX.nope();message('You can bet Player or Banker in a hand, not both.');return false}
-  if(room<=0||(!allIn&&amt>room)){SFX.nope();message(`${TIER().name} maximum is ${fmt(TIER().max).replace('.00','')} per spot.`);return false}
+  if(room<=0||(!allIn&&amt>room)){SFX.nope();message(`${TIER().name} maximum is ${limit(TIER().max)} per spot.`);return false}
   if(amt<=0||balance<amt){SFX.nope();message(allIn?'You have no chips left to put in — tap Top up, or pick a smaller table.':balance+Object.values(bets).reduce((a,b)=>a+b,0)<TIER().min?'Out of chips for this table — tap Top up, or pick a smaller table.':'Not enough balance for that chip — try a smaller chip.');return false}
   const capped=allIn&&amt<Math.floor(balance);
   balance-=amt;bets[k]=(bets[k]||0)+amt;lastSpot=k;clearWins();
@@ -1468,12 +1553,19 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
    if(bankerDraws(b,v)){round.stage='bThird';msg=`Banker has ${b} and must draw a third card.`}
    else{round.stage='done';msg=`Banker has ${b} and stands.`}
   }else round.stage='done';
-  return msg;
+  return round.deal.some(c=>c.sealed)?'':msg;   // no hints about cards you can't see yet
  }
  function finalize(c){
   if(!round||c.up||!round.deal.includes(c))return;
   SFX.snap();
   if(NET.on&&!c.remote)NET.send({t:'reveal',i:c.i}); // tell the table you turned it
+  if(c.remote&&hiddenFromMe(c)){   // opened by its squeezer: you see it when the hand ends
+   c.up=true;c.landed=true;c.sealed=true;c.peel=null;renderPeel(c);c.el.classList.remove('dragging');c.el.classList.add('sealed');
+   updateScores();checkProgress();
+   message(`${pname(round.squeezer[c.side])} opened a ${name(c.side)} card — you'll see it when the hand ends.`);
+   setButton();afterStage();
+   const r=round;setTimeout(()=>{if(round===r){giveCards();setButton()}},450);   // your side may be up next
+   return}
   c.up=true;c.landed=true;c.el.classList.remove('down','dragging');c.el.classList.add('up');updateScores();
   const extra=checkProgress();
   message(`${name(c.side)} card: ${cardLabel(c)}. ${extra}`.trim());
@@ -1509,7 +1601,7 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
   }
   if(!Object.values(bets).some(v=>v>0)){message('Place at least one bet before dealing.');return}
   rememberBets();
-  if(shoe.length<20)freshShoe();
+  if(shoe.length<20)newShoe();   // the shoe is finished: a fresh one, shuffled automatically
   clearWins();$('banner').classList.remove('show');
   table={player:[],banker:[]};$('playerCards').innerHTML='';$('bankerCards').innerHTML='';$('zoneCards').innerHTML='';zoneOn();
   round={stage:'peel',deal:[],mine:mySide(),instant:false};document.body.classList.add('inround');
@@ -1559,7 +1651,8 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
    if(t==='ppair')pay=pPair?amt*(1+PAYOUT.ppair):0;
    if(t==='bpair')pay=bPair?amt*(1+PAYOUT.bpair):0;
    gross+=pay}
-  addProfit(gross-stakedAll);balance+=gross;history.push(result);counts[result]++;
+  addProfit(gross-stakedAll);balance+=gross;const natural=table.player.length===2&&table.banker.length===2&&((result==='P'&&p>=8)||(result==='B'&&b>=8));
+  history.push(panda?'A':dragon?'D':natural?(result==='P'?(p===9?'R':'Q'):(b===9?'U':'S')):result);counts[result]++;
   const nm={P:'PLAYER',B:'BANKER',T:'TIE'}[result];
   $('roundSummary').innerHTML=`Outcome: <b>${nm}</b> (${p}–${b})<br>Panda 8: <b>${panda?'HIT':'miss'}</b> · Dragon 7: <b>${dragon?'HIT':'miss'}</b> · 9 over 7: <b>${nine7?'HIT':'miss'}</b><br>Player Pair: <b>${pPair?'HIT':'miss'}</b> · Banker Pair: <b>${bPair?'HIT':'miss'}</b><br>Returned from bets: <b>${fmt(gross)}</b><br>Balance: <b>${fmt(balance)}</b>`;
   const winTypes=new Set([{P:'player',B:'banker',T:'tie'}[result]]);if(panda)winTypes.add('panda');if(dragon)winTypes.add('dragon');if(nine7)winTypes.add('nine7');if(pPair)winTypes.add('ppair');if(bPair)winTypes.add('bpair');
@@ -1576,7 +1669,9 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
   if(dragon&&onDragon){SFX.dragon();FX.dragon()}else if(panda&&onPanda){SFX.panda();FX.panda()}
   setTimeout(()=>SFX.result(gross,stakedAll),dragon&&onDragon?2300:panda&&onPanda?900:120);
  }
- $('newShoeBtn').onclick=()=>{if(round){message('Settle the current hand before shuffling.');return}freshShoe();SFX.riffle();message('A new eight-deck shoe has been shuffled.')};
+ // a new shoe: shuffled eight decks and a clean roadmap, like a real table
+ function newShoe(){freshShoe();history=[];counts={P:0,B:0,T:0};renderHistory();SFX.riffle();nudge('NEW SHOE · SHUFFLED')}
+ $('newShoeBtn').onclick=()=>{if(round){message('Settle the current hand before shuffling.');return}newShoe();message('A new eight-deck shoe has been shuffled.')};
  $('resetBtn').onclick=()=>{if(round){message('Settle the current hand before resetting.');return}
   if(NET.on){if(Object.values(bets).some(v=>v>0)){message('Clear your bets first.');return}NET.send({t:'rebuy',amount:startAmt()});message(balance>=startAmt()?`You already have at least your starting ${fmt(startAmt()).replace('.00','')}, so your chips stay as they are.`:`Topped up to ${fmt(startAmt()).replace('.00','')} in virtual chips.`);return}
   balance+=Object.values(bets).reduce((a,b)=>a+b,0);const before=balance;balance=Math.max(balance,startAmt());bets={};
@@ -1589,8 +1684,9 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
  const NET={betHold:0,on:false,ws:null,me:null,code:null,players:[],phase:'betting',ready:false,countdownEnds:null,
   send(m){if(this.ws&&(this.ws.readyState===1||this.room))this.ws.send(JSON.stringify(m))}};
  const serverURL=()=>{const meta=document.querySelector('meta[name="gs-server"]'),v=meta&&meta.content.trim();
-  if(v)return v;if(/\.github\.io$/i.test(location.hostname))return null;   // GitHub Pages has no table server: set gs-server above to use one
-  if(/^https?:/.test(location.protocol))return (location.protocol==='https:'?'wss://':'ws://')+location.host+'/ws';return null};
+  if(v&&v!=='same')return v;
+  // "same": the table server is hosting this page. Anywhere else with no address set, there's no server to reach.
+  if(v==='same'&&/^https?:/.test(location.protocol))return (location.protocol==='https:'?'wss://':'ws://')+location.host+'/ws';return null};
  const pname=id=>{const p=NET.players.find(x=>x.id===id);return p?(id===NET.me?'You':p.name):'Dealer'};
  function squeezerNames(){if(!round||!round.squeezer)return '';const out=[];
   for(const s of ['player','banker']){const id=round.squeezer[s];if(id&&id!==NET.me&&round.deal.some(c=>c.side===s&&!c.up))out.push(`${pname(id)} is`)}
@@ -1614,6 +1710,9 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
     out+=`<g class="bchip other" transform="translate(${f(c.x)} ${f(c.y)})"><circle r="15" fill="${chipColor(a)}" stroke="#fff" stroke-width="2.4" stroke-dasharray="5 4"/><text style="font-size:9.5px">${short(a)}</text></g>`}});
   return out;
  }
+ // chip amounts that fit on a seat: $4,990 · $120K · $1.25M
+ const cash=a=>{a=Math.floor(a||0);return a>=1e12?'$'+(+(a/1e12).toFixed(2))+'T':a>=1e9?'$'+(+(a/1e9).toFixed(2))+'B':a>=1e6?'$'+(+(a/1e6).toFixed(2))+'M':a>=1e5?'$'+Math.round(a/1e3)+'K':'$'+a.toLocaleString('en-US')};
+ const myLabel=()=>{const p=NET.on&&NET.players.find(x=>x.id===NET.me);return (p&&p.name)||walletName||'You'};
  function renderSeats(){
   const L=document.getElementById('seatLayer');if(!L)return;
   const sq=round&&round.squeezer||{},list=seatList();
@@ -1626,8 +1725,8 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
    out+=`<g class="seat${p?'':' open'}${mine?' mine':''}" transform="translate(${f(x)} ${f(y)}) rotate(${-phi})">
     <rect x="-62" y="-24" width="124" height="48" rx="24"/>
     <text class="sno" x="-44" y="7">${k+1}</text>
-    <text class="snm" x="8" y="${p?-3:6}">${p?esc(mine?'You':p.name).slice(0,12):'Open seat'}</text>
-    ${p?`<text class="sbt" x="8" y="14">${bet?short(bet)+(lean?' on '+lean:''):(p.ready&&!round?'Ready':'No bet')}</text>`:''}
+    <text class="snm" x="8" y="${p?-3:6}">${p?esc(mine?myLabel():p.name).slice(0,12):'Open seat'}</text>
+    ${p?`<text class="sbt" x="8" y="14">${cash(mine?balance:p.balance)}${bet?' · '+cash(bet)+(lean?' '+lean:''):(p.ready&&!round?' · Ready':'')}</text>`:''}
     ${peels?`<g transform="translate(0 -31)"><rect x="-26" y="-9" width="52" height="17" rx="8.5" class="ptag"/><text class="ptx" y="4">PEELS</text></g>`:''}
    </g>`;
   }
@@ -1675,7 +1774,8 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
  // a card someone else turned (or the dealer turned) — show it turning over here too
  function remoteReveal(c){
   if(c.up)return;c.remote=true;
-  const go=()=>{if(c.peel&&c.frac>.01)revealFully(c,380);else{c.anim=true;
+  const go=()=>{if(hiddenFromMe(c)){c.anim=false;finalize(c);return}
+   if(c.peel&&c.frac>.01)revealFully(c,380);else{c.anim=true;
    const half=180,tf=c.el.animate([{transform:'none'},{transform:'perspective(700px) rotateY(90deg) scale(1.06)'}],{duration:half,easing:'ease-in'});
    tf.onfinish=()=>{c.anim=false;finalize(c);c.el.animate([{transform:'perspective(700px) rotateY(-90deg) scale(1.06)'},{transform:'none'}],{duration:half,easing:'ease-out'})}}};
   if(!c.landed)setTimeout(go,Math.max(0,c.landIn||0));else if(c.anim)setTimeout(()=>{if(!c.up)go()},450);else go();
@@ -1702,6 +1802,13 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
  }
  function settleOnline(m){
   if(!round)return;
+  round.settling=true;
+  const sealed=round.deal.filter(c=>c.sealed);
+  for(const c of sealed){c.sealed=false;c.el.classList.remove('sealed');
+   c.el.animate([{transform:'none'},{transform:'perspective(700px) rotateY(90deg) scale(1.06)'}],{duration:220,easing:'ease-in'}).onfinish=()=>{
+    c.el.classList.remove('down');c.el.classList.add('up');updateScores();
+    c.el.animate([{transform:'perspective(700px) rotateY(-90deg) scale(1.06)'},{transform:'none'}],{duration:220,easing:'ease-out'})}}
+  if(sealed.length)SFX.snap();
   for(const c of round.deal)if(!c.up){c.remote=true;c.anim=false;finalize(c)}
   round.deal.forEach(c=>takeBack(c,true));
   const nm={P:'PLAYER',B:'BANKER',T:'TIE'}[m.result],mine=m.payouts[NET.me]||{gross:0,staked:0};
@@ -1716,17 +1823,26 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
   $('phase').textContent='Next hand soon';render();
   const winners=NET.players.filter(p=>p.id!==NET.me&&m.payouts[p.id]&&m.payouts[p.id].gross>m.payouts[p.id].staked).map(p=>`${p.name} +${fmt(m.payouts[p.id].gross-m.payouts[p.id].staked).replace('.00','')}`);
   message((mine.staked?(mine.gross>0?`${nm} wins — you got back ${fmt(mine.gross)}.`:`${nm} wins — no payout for you this hand.`):`${nm} wins.`)+(mine.bankerPush?' Banker bet pushes on the three-card 7.':'')+(winners.length?` Also winning: ${winners.join(', ')}.`:''));
+  const showBanner=()=>{
   const bn=$('banner');bn.innerHTML=`<b>${nm} ${m.result==='T'?'':'WINS'} ${m.p}–${m.b}</b><span class="${mine.gross>0?'':'lose'}">${mine.staked?(mine.gross>0?'+'+fmt(mine.gross):'No win this hand'):'Place a bet to join the next hand'}</span>`;
   bn.classList.add('show');clearTimeout(bn.t);bn.t=setTimeout(()=>bn.classList.remove('show'),2800);
   if(m.dragon&&onDragon){SFX.dragon();FX.dragon()}else if(m.panda&&onPanda){SFX.panda();FX.panda()}
-  setTimeout(()=>SFX.result(mine.gross||0,mine.staked||0),m.dragon&&onDragon?2300:m.panda&&onPanda?900:120);
+  setTimeout(()=>SFX.result(mine.gross||0,mine.staked||0),m.dragon&&onDragon?2300:m.panda&&onPanda?900:120);};
+  if(sealed.length)setTimeout(showBanner,550);else showBanner();   // let the hidden cards flip over first
+ }
+ function abortRound(msg){
+  round=null;table={player:[],banker:[]};$('playerCards').innerHTML='';$('bankerCards').innerHTML='';$('zoneCards').innerHTML='';zoneOn();
+  document.body.classList.remove('inround');$('layout').classList.remove('locked');clearYours();clearWins();
+  $('clearBtn').disabled=false;$('peelBtn').disabled=true;$('peelBtn').textContent='Squeeze for me';$('finishBtn').disabled=true;
+  NET.ready=false;NET.readyHold=0;NET.betHold=0;updateScores();readyLabel();message(msg);
  }
  function onNet(m){
   switch(m.t){
+   case 'abort':abortRound(m.msg);break;
    case 'welcome':NET.me=m.you;NET.code=m.code;setTier(m.tier);$('lobby').hidden=true;document.body.classList.add('online');
-    try{localStorage.setItem('gs.lastCode',m.code)}catch(e){}
+    try{localStorage.setItem('gs.lastCode',m.code);sessionStorage.setItem('gs.lastCode',m.code)}catch(e){}
     if(loadWallet()<TIER().min)setTimeout(()=>message(`You need at least ${fmt(TIER().min).replace('.00','')} to bet at ${TIER().name}. You can watch, or reset your bankroll in History & settings.`),1200);
-    message(`You're at ${TIER().name} table ${m.code} (${fmt(TIER().min).replace('.00','')}–${fmt(TIER().max).replace('.00','')} per spot). Share the code so friends can join.`);break;
+    message(`You're at ${TIER().name} table ${m.code} (${fmt(TIER().min).replace('.00','')}–${limit(TIER().max)} per spot). Share the code so friends can join.`);break;
    case 'state':{
     {const tot=pl=>pl.filter(p=>p.id!==NET.me).reduce((a,p)=>a+Object.values(p.bets||{}).reduce((x,y)=>x+y,0),0);
      if(!round&&NET.players.length&&tot(m.players)>tot(NET.players))SFX.chip(.45)}
@@ -1734,7 +1850,7 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
     const my=m.players.find(p=>p.id===NET.me);
     if(my){const mine=Object.values(bets).reduce((a,b)=>a+b,0),theirs=Object.values(my.bets||{}).reduce((a,b)=>a+b,0);
      if(round||Date.now()>NET.betHold){balance=my.balance;bets={...my.bets}}else balance=my.balance+theirs-mine;if(Date.now()>(NET.readyHold||0))NET.ready=my.ready}
-    history=m.history||[];counts={P:0,B:0,T:0};history.forEach(x=>counts[x]++);
+    history=m.history||[];counts={P:0,B:0,T:0};history.forEach(x=>{if(counts[base(x)]!==undefined)counts[base(x)]++});
     $('shoeInfo').textContent=`8 decks · ${m.shoeLeft} cards`;
     render();renderPlayers();readyLabel();break;}
    case 'deal':startOnlineRound(m);break;
@@ -1743,10 +1859,10 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
     $('peelBtn').disabled=true;const r=round;setTimeout(()=>{if(round===r){if(c.mine)giveCards();setButton()}},c.landIn+80);break;}
    case 'reveal':{if(!round)break;const c=round.deal.find(x=>x.i===m.i);if(c&&!c.up)remoteReveal(c);break;}
    case 'peel':{if(!round)break;const c=round.deal.find(x=>x.i===m.i);
-    if(c&&!c.up&&!c.mine&&!c.anim)glidePeel(c,m);break;}
+    if(c&&!c.up&&!c.mine&&!c.anim&&!hiddenFromMe(c))glidePeel(c,m);break;}
    case 'squeezer':if(round){round.squeezer[m.side]=m.id;for(const c of round.deal)if(c.side===m.side&&!c.up){c.mine=m.id===NET.me;c.canTap=false;c.el.classList.toggle('mine',c.mine);c.el.classList.remove('opp');c.el.classList.toggle('watch',!c.mine)}giveCards();setButton();renderPlayers()}break;
    case 'result':settleOnline(m);break;
-   case 'shuffle':SFX.riffle();message('The dealer shuffles a fresh eight-deck shoe.');break;
+   case 'shuffle':SFX.riffle();nudge('NEW SHOE · SHUFFLED');message('The shoe is finished — the dealer shuffles a fresh eight-deck shoe.');break;
    case 'chat':if(/sat down/.test(m.text))SFX.ding();message(m.from==='Dealer'?m.text:`${m.from}: ${m.text}`);break;
    case 'error':NET.betHold=0;NET.readyHold=0;if($('lobby').hidden)message(m.msg);else $('lobbyErr').textContent=m.msg;break;
   }
@@ -1777,14 +1893,21 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
   const T={readyState:0,onopen:null,onmessage:null,onclose:null,onerror:null};
   const deliver=m=>{try{T.onmessage&&T.onmessage({data:JSON.stringify(m)})}catch(e){console.error(e)}};
   const rid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
-  const myId='p'+rid(),isHost=first.t==='create';
-  let code=isHost?Array.from({length:4},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.random()*24|0]).join(''):String(first.code||'').toUpperCase();
-  let closed=false,unsub=[],handNow=-1;
-  const close=(why)=>{if(closed)return;closed=true;T.readyState=3;unsub.forEach(u=>{try{u()}catch(e){}});room.presence({gs:null}).catch(()=>{});
+  const newCode=()=>Array.from({length:4},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.random()*24|0]).join('');
+  const myId='p'+rid();
+  let code=first.t==='create'?newCode():String(first.code||'').toUpperCase();
+  let closed=false,unsub=[],handNow=-1,lastSn=null,mode=null;
+  const stopListening=()=>{unsub.forEach(u=>{try{u()}catch(e){}});unsub=[]};
+  const close=(why)=>{if(closed)return;closed=true;T.readyState=3;stopListening();room.presence({gs:null}).catch(()=>{});
    if(why)try{sessionStorage.setItem('gs.notice',why)}catch(e){};T.onclose&&T.onclose()};
   T.close=()=>close(null);
-  if(isHost){
-   // ---------- host: run the dealer here ----------
+  const opened=()=>{if(T.readyState!==1){T.readyState=1;T.onopen&&T.onopen()}};
+  const lost=e=>close(e&&e.code==='not_granted'?NO_LIVE:'Lost the connection to your friends. Your chips are safe.');
+  const myChips=()=>Math.floor(balance+Object.values(bets).reduce((a,b)=>a+b,0));
+
+  // ---------- host: run the dealer in this browser ----------
+  function startHost(createMsg,takeover){
+   mode='host';
    const core=window.GSTable;
    let hand=0,res=null,chat={n:0,text:''},shuf=0,notes={},queued=false,pub=null;
    const snap=()=>{const r=core.rooms.get(code);if(!r)return null;
@@ -1799,16 +1922,19 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
     if(m.t==='deal'&&!m.late){hand++;handNow=hand}if(m.t==='result'){res={n:(res?res.n:0)+1,...m}}
     if(m.t==='chat')chat={n:chat.n+1,text:m.text};if(m.t==='shuffle')shuf++;
     deliver(m);publish()}};
-   const pipes=new Map();   // peer label -> {pipe, seen}
+   const pipes=new Map();   // peer label -> that player's connection to the dealer
    const pipeFor=(peer,id)=>{let e=pipes.get(peer);if(!e){e={pipe:{readyState:1,id,send(str){const m=JSON.parse(str);
      if(m.t==='error'){notes[id]={n:(notes[id]?notes[id].n:0)+1,msg:m.msg};publish()}}},bn:0,rdy:0,rb:0,rv:new Set(),rh:-1,joined:false};pipes.set(peer,e)}return e};
    T.send=json=>{const m=JSON.parse(json);
     if(m.t==='peel'){pub={i:m.i,G:m.G,P:m.P,inw:m.inw,h:hand};publish();return}
     setTimeout(()=>{core.handle(hostPipe,m);publish()},0)};
    const onPeers=ch=>{
+    if(closed||mode!=='host')return;
     for(const pr of ch.peers){if(pr.sameTab)continue;const g=pr.presence&&pr.presence.gs;if(!g||g.code!==code||g.host)continue;
      const e=pipeFor(pr.peer,String(g.id||pr.peer));
-     if(!e.joined){e.joined=true;core.handle(e.pipe,{t:'join',code,name:g.name,bankroll:g.bank,id:e.pipe.id})}
+     if(!e.joined){e.joined=true;core.handle(e.pipe,{t:'join',code,name:g.name,bankroll:g.bank,id:e.pipe.id});
+      // only what they do from now on counts (a player arriving from another dealer brings old counters)
+      e.bn=g.bn|0;e.rdy=(g.rs&&g.rs.n)|0;e.rb=g.rb|0;e.rh=g.rh;e.rv=new Set(Array.isArray(g.rv)?g.rv:[]);continue}
      if((g.bn|0)>e.bn){e.bn=g.bn|0;core.handle(e.pipe,{t:'bet',bets:g.bets||{}})}
      if(g.rs&&(g.rs.n|0)>e.rdy){e.rdy=g.rs.n|0;core.handle(e.pipe,{t:g.rs.on?'ready':'unready'})}
      if((g.rb|0)>e.rb){e.rb=g.rb|0;core.handle(e.pipe,{t:'rebuy',amount:g.rba})}
@@ -1816,22 +1942,31 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
       for(const i of g.rv)if(!e.rv.has(i)){e.rv.add(i);core.handle(e.pipe,{t:'reveal',i})}}
     }
     for(const pr of ch.left){const e=pipes.get(pr.peer);if(e){pipes.delete(pr.peer);core.leave(e.pipe)}}
+    // a peer whose presence no longer names this table has left it
+    for(const [peer,e] of pipes){const pr=ch.peers.find(x=>x.peer===peer),g=pr&&pr.presence&&pr.presence.gs;
+     if(!g||g.code!==code||g.host){pipes.delete(peer);core.leave(e.pipe)}}
     publish();relayPeels(ch.peers);
    };
-   // make sure nobody else is already hosting this code, then open the table
-   setTimeout(()=>{
-    if(room.peers().some(pr=>!pr.sameTab&&pr.presence&&pr.presence.gs&&pr.presence.gs.host&&pr.presence.gs.code===code))
-     code=Array.from({length:4},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.random()*24|0]).join('');
-    T.readyState=1;T.onopen&&T.onopen();
-    core.handle(hostPipe,{...first,code,id:myId});
-    unsub.push(room.onPeers(onPeers,e=>close(e&&e.code==='not_granted'?NO_LIVE:'Lost the connection to your friends. Your chips are safe.')));
+   const open=()=>{
+    opened();
+    core.handle(hostPipe,{...createMsg,code,id:myId});
+    unsub.push(room.onPeers(onPeers,lost));
     publish();
-   },700);
-  }else{
-   // ---------- guest: tell the host what you do, follow the host's table ----------
+   };
+   if(takeover)return open();
+   // make sure nobody else is already dealing a table with this code, then open it
+   setTimeout(()=>{
+    if(room.peers().some(pr=>!pr.sameTab&&pr.presence&&pr.presence.gs&&pr.presence.gs.host&&pr.presence.gs.code===code))code=newCode();
+    open()},700);
+  }
+
+  // ---------- guest: tell the dealer what you do, follow the dealer's table ----------
+  function startGuest(){
+   mode='guest';
    const me={code,id:myId,name:first.name,bank:first.bankroll,bets:{},bn:0,rs:{n:0,on:false},rv:[],rh:-1,rb:0,rba:0,sq:null};
    const say=()=>{if(!closed)room.presence({gs:me}).catch(()=>{})};
-   let curHand=-1,last=null,joined=false,seenCards=0,seenUp=new Set(),lastRes=0,lastChat=0,lastShuf=0,lastNote=0,sqKnown={},hostSeen=0,hostGone=null;
+   let curHand=-1,last=null,joined=false,seenCards=0,seenUp=new Set(),lastRes=0,lastChat=0,lastShuf=0,lastNote=0,sqKnown={},
+    hostId=null,hostGone=null,giveUp=null;
    T.send=json=>{const m=JSON.parse(json);
     if(m.t==='bet'){me.bets=m.bets;me.bn++}
     else if(m.t==='ready'||m.t==='unready')me.rs={n:me.rs.n+1,on:m.t==='ready'};
@@ -1839,10 +1974,12 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
     else if(m.t==='peel')me.sq={i:m.i,G:m.G,P:m.P,inw:m.inw,h:curHand};
     else if(m.t==='rebuy'){me.rb++;me.rba=m.amount}
     else return;say()};
-   const apply=sn=>{
-    if(!joined){if(!sn.pl.some(p=>p[0]===myId))return;joined=true;T.readyState=1;T.onopen&&T.onopen();
+   const apply=(sn,newDealer)=>{
+    if(!joined){if(!sn.pl.some(p=>p[0]===myId))return;joined=true;opened();
      lastChat=sn.chat?sn.chat.n:0;lastShuf=sn.shuf||0;lastRes=sn.res?sn.res.n:0;
      deliver({t:'welcome',you:myId,code:sn.code,tier:sn.tier})}
+    else if(newDealer){   // someone else took over dealing: start counting their messages from here
+     lastChat=0;lastShuf=sn.shuf||0;lastRes=sn.res?sn.res.n:0;lastNote=0;curHand=-1;seenCards=0;seenUp=new Set();sqKnown={};me.rv=[];me.rh=-1}
     const note=sn.notes&&sn.notes[myId];if(note&&note.n>lastNote){lastNote=note.n;deliver({t:'error',msg:note.msg})}
     if(sn.chat&&sn.chat.n>lastChat){lastChat=sn.chat.n;deliver({t:'chat',from:'Dealer',text:sn.chat.text})}
     if((sn.shuf||0)>lastShuf){lastShuf=sn.shuf;deliver({t:'shuffle'})}
@@ -1859,21 +1996,42 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
     if(sn.res&&sn.res.n>lastRes){lastRes=sn.res.n;const {n,...m}=sn.res;deliver(m)}
     deliver({t:'state',code:sn.code,tier:sn.tier,phase:sn.phase,countdownEnds:sn.ce,shoeLeft:sn.sl,
      players:sn.pl.map(([id,name,balance,bets,ready])=>({id,name,balance,bets,ready:!!ready})),history:sn.hi.split('')});
+    // keep my chip count current, so if the dealer leaves, whoever takes over seats me with the right amount
+    const mine=sn.pl.find(p=>p[0]===myId);
+    if(mine&&!sn.rd){const bank=Math.floor(mine[2]+Object.values(mine[3]||{}).reduce((a,b)=>a+b,0));if(bank!==me.bank){me.bank=bank;say()}}
+   };
+   // the dealer left: the friend with the earliest seat id takes over, so the table keeps going
+   const electDealer=()=>{
+    hostGone=null;if(closed||mode!=='guest')return;
+    const ids=[myId,...room.peers().filter(pr=>!pr.sameTab&&pr.presence&&pr.presence.gs&&pr.presence.gs.code===code&&!pr.presence.gs.host)
+     .map(pr=>String(pr.presence.gs.id||''))].filter(Boolean).sort();
+    if(ids[0]===myId){
+     stopListening();clearTimeout(giveUp);clearTimeout(hostGone);hostGone=null;
+     deliver({t:'abort',msg:'The dealer left, so you are dealing now. Any hand in play was called off and its bets returned.'});
+     startHost({t:'create',name:first.name,tier:lastSn?lastSn.tier:first.tier,open:lastSn?lastSn.open!==false:true,bankroll:myChips()},true);
+    }else if(!giveUp)giveUp=setTimeout(()=>close('The table closed. Your chips are safe.'),9000);
    };
    const onPeers=ch=>{
+    if(closed||mode!=='guest')return;
     const host=ch.peers.find(pr=>!pr.sameTab&&pr.presence&&pr.presence.gs&&pr.presence.gs.host&&pr.presence.gs.code===code);
-    if(host){hostSeen=Date.now();clearTimeout(hostGone);hostGone=null;const sn=host.presence.gs.host;if(sn!==last){last=sn;apply(sn)}}
-    else if(joined&&!hostGone)hostGone=setTimeout(()=>close('The host closed the table. Your chips are safe.'),5000);
+    if(host){clearTimeout(hostGone);hostGone=null;clearTimeout(giveUp);giveUp=null;
+     const sn=host.presence.gs.host,hid=host.presence.gs.id;
+     const newDealer=joined&&hostId!==null&&hid!==hostId;
+     if(newDealer)deliver({t:'abort',msg:'The dealer left and a friend took over. Any hand in play was called off and its bets returned.'});
+     hostId=hid;
+     if(sn!==last||newDealer){last=sn;lastSn=sn;apply(sn,newDealer)}}
+    else if(joined&&!hostGone)hostGone=setTimeout(electDealer,3000);
     relayPeels(ch.peers);
    };
    say();
-   unsub.push(room.onPeers(onPeers,e=>close(e&&e.code==='not_granted'?NO_LIVE:'Lost the connection to your friends. Your chips are safe.')));
-   setTimeout(()=>{if(!joined&&!closed){$('lobbyErr').textContent=`No open table with code ${code}. Check the code, and make sure the friend who started it still has the game open on this same page.`;close(null)}},12000);
+   unsub.push(room.onPeers(onPeers,lost));
+   setTimeout(()=>{if(!joined&&!closed){$('lobbyErr').textContent=`No open table with code ${code}. Check the code, and make sure a friend is still at that table on this same page.`;close(null)}},12000);
   }
   // other players' squeezes, straight from their presence
   const peelSeen=new Map();
   function relayPeels(peers){for(const pr of peers){if(pr.sameTab)continue;const g=pr.presence&&pr.presence.gs;if(!g||g.code!==code||!g.sq)continue;
    if(g.sq.h!==handNow||peelSeen.get(pr.peer)===g.sq)continue;peelSeen.set(pr.peer,g.sq);deliver({t:'peel',...g.sq})}}
+  if(first.t==='create')startHost(first,false);else startGuest();
   return T;
  }
  async function connect(first){
@@ -1903,13 +2061,19 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
  }
  /* ---------- start screen ---------- */
  const nameIn=$('nameIn'),codeIn=$('codeIn');
- try{nameIn.value=localStorage.getItem('gs.name')||'';codeIn.value=''}catch(e){}
- const myName=()=>{const n=nameIn.value.trim().slice(0,14)||'Player';try{localStorage.setItem('gs.name',n)}catch(e){}return n};
+ nameIn.value=walletName==='Player'?'':walletName;codeIn.value='';
+ // switch to the chips saved for the name in the box (nothing is saved until you play or set a starting amount)
+ function useName(){const n=nameIn.value.trim().slice(0,14)||'Player';
+  if(n!==walletName){walletName=n;balance=loadWallet();bets={};profit=Number(getK('profit'))||0;showProfit()}
+  try{sessionStorage.setItem('gs.me',n);localStorage.setItem('gs.name',n)}catch(e){}CLOUD.bind();return n}
+ const myName=useName;
+ nameIn.addEventListener('input',()=>{if(NET.on)return;const n=nameIn.value.trim().slice(0,14)||'Player';
+  if(n!==walletName){walletName=n;balance=loadWallet();bets={};profit=Number(getK('profit'))||0;showProfit();renderLobby()}});
  // ---- open tables anyone can join ----
  function showTables(list){
   const box=$('openTables');box.hidden=false;
   $('tableList').innerHTML=list.length?list.map(t=>{const T=TIERS[t.tier]||TIERS.lounge;
-   return `<div class="trow" style="--tf:${T.felt}"><span class="tdot"></span><span class="tinfo"><b>${esc(t.host)}'s table · ${T.name}</b><span>${fmt(T.min).replace('.00','')}–${fmt(T.max).replace('.00','')} · ${t.players}/${t.max} players${t.playing?' · hand in play':''}</span></span><button data-join="${t.code}">Join</button></div>`}).join('')
+   return `<div class="trow" style="--tf:${T.felt}"><span class="tdot"></span><span class="tinfo"><b>${esc(t.host)}'s table · ${T.name}</b><span>${fmt(T.min).replace('.00','')}–${limit(T.max)} · ${t.players}/${t.max} players${t.playing?' · hand in play':''}</span></span><button data-join="${t.code}">Join</button></div>`}).join('')
    :'<div class="tempty">No open tables right now. Start one and friends will see it here.</div>';
   document.querySelectorAll('[data-join]').forEach(b=>b.onclick=()=>{codeIn.value=b.dataset.join;$('joinBtn').click()});
  }
@@ -1917,11 +2081,13 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
   const room=await ROOMP;
   if(room){   // the game page: open tables are the hosts advertising in the live room
    room.onPeers(ch=>{if($('lobby').hidden)return;
+    showRejoin(ch.peers.some(pr=>!pr.sameTab&&pr.presence&&pr.presence.gs&&pr.presence.gs.host&&pr.presence.gs.code===lastTable()));
     showTables(ch.peers.filter(pr=>!pr.sameTab&&pr.presence&&pr.presence.gs&&pr.presence.gs.host&&pr.presence.gs.host.open!==false).map(pr=>{const h=pr.presence.gs.host;
      return {code:h.code,tier:h.tier,players:h.pl.length,max:7,host:(h.pl[0]||[])[1]||'Someone',playing:!!h.rd}}).filter(t=>t.players<7))},()=>{});
    return;
   }
   const url=serverURL();if(!url)return;   // the apps and website: ask the table server
+  showRejoin(!!lastTable());
   let ws=null;const ask=()=>{if($('lobby').hidden||NET.on)return;
    if(!ws||ws.readyState>1){try{ws=new WebSocket(url)}catch(e){return}ws.onopen=()=>ws.send(JSON.stringify({t:'list'}));
     ws.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.t==='tables')showTables(m.tables)}catch(x){}};ws.onerror=()=>{}}
@@ -1931,9 +2097,10 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
  // ---- table picker ----
  function renderLobby(){
   const w=loadWallet();$('walletAmt').textContent=fmt(w).replace('.00','');
+  $('whoAmI').innerHTML=`Playing as ${esc(walletName)} · <b>${fmt(w).replace('.00','')}</b>`;
   if(w<TIERS.lounge.min)openStart(true);   // out of chips: offer a fresh start right away
   $('tiers').innerHTML=Object.entries(TIERS).map(([id,t])=>`<div class="tier${id===pickedTier?' sel':''}" data-tier="${id}" style="--tf:${t.felt}">
-   <b>${t.name}</b><span>${fmt(t.min).replace('.00','')} – ${fmt(t.max).replace('.00','')}</span><small>per spot</small></div>`).join('');
+   <b>${t.name}</b><span>${fmt(t.min).replace('.00','')} – ${limit(t.max)}</span><small>per spot</small></div>`).join('');
   document.querySelectorAll('.tier').forEach(el=>el.onclick=()=>{const id=el.dataset.tier;
    pickedTier=id;try{localStorage.setItem('gs.tier',id)}catch(e){}$('lobbyErr').textContent='';renderLobby()});
  }
@@ -1952,17 +2119,49 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
  $('changeBtn').onclick=()=>{if($('startPanel').hidden)openStart(false);else{$('startPanel').hidden=true;$('changeBtn').textContent='Change'}};
  $('startRange').oninput=e=>showStart(valOf(+e.target.value),true);
  document.querySelectorAll('.presets button').forEach(b=>b.onclick=()=>showStart(+b.dataset.amt));
- $('startSet').onclick=()=>{const v=pickedStart;try{localStorage.setItem('gs.start',String(v))}catch(e){}
-  const had=loadWallet();balance=Math.max(had,v);bets={};saveWallet();render();$('startPanel').hidden=true;$('changeBtn').textContent='Change';renderLobby();
-  $('lobbyErr').textContent=had>=v?`Starting amount set to ${fmtK(v)}. You keep your ${fmtK(had)}.`:`Topped up to ${fmtK(v)} in virtual chips.`};
- $('soloBtn').onclick=()=>{if(!canSit())return;setTier(pickedTier);balance=loadWallet();bets={};render();$('lobby').hidden=true;
-  message(`${TIER().name}: ${fmt(TIER().min).replace('.00','')}–${fmt(TIER().max).replace('.00','')} per spot. Pick a chip, tap a spot, then Deal.`)};
- $('createBtn').onclick=()=>{if(!canSit())return;connect({t:'create',name:myName(),tier:pickedTier,bankroll:loadWallet(),open:$('openChk').checked})};
- $('joinBtn').onclick=()=>{const code=codeIn.value.trim().toUpperCase();if(code.length!==4){$('lobbyErr').textContent='Enter the 4-letter table code.';return}connect({t:'join',code,name:myName(),bankroll:loadWallet()})};
+ $('startSet').onclick=()=>{useName();const v=pickedStart;setK('start',v);try{localStorage.setItem('gs.lastStart',String(v))}catch(e){}
+  balance=v;bets={};setK('wallet',v);setK('walletAt',Date.now());saveWallet();render();
+  $('startPanel').hidden=true;$('changeBtn').textContent='Change';renderLobby();
+  $('lobbyErr').textContent=`Your chips are set to ${fmtK(v)}. Start or join a table to play with them.`};
+ // ---- before you sit down: how much do you want to play with? ----
+ let buyPick=START_DEFAULT,buyThen=null,buyTier=null;
+ function buyShow(v,fromSlider){v=Math.max(START_MIN,Math.min(START_MAX,Math.round(v/100)*100));buyPick=v;
+  if(!fromSlider)$('buyRange').value=posOf(v);$('buyAmt').textContent=fmtK(v);$('buyGo').textContent=`Sit down with ${fmtK(v)}`;
+  document.querySelectorAll('[data-buy]').forEach(b=>b.classList.toggle('on',+b.dataset.buy===v));
+  $('buyNote').textContent=buyTier&&v<buyTier.min?`${buyTier.name} bets start at ${fmtK(buyTier.min)} — that's not enough to bet there.`:buyTier?`${buyTier.name}: ${fmtK(buyTier.min)}–${limit(buyTier.max)} per spot.`:''}
+ function askBankroll(tier,then){useName();buyThen=then;buyTier=tier;const cur=Math.floor(loadWallet());
+  $('buyWho').textContent=`${walletName} · you have ${fmtK(cur)}`;
+  $('buyKeep').textContent=`Keep my ${fmtK(cur)}`;$('buyKeep').hidden=cur<=0;
+  buyShow(cur>=START_MIN&&cur<=START_MAX?cur:cur>START_MAX?START_MAX:START_DEFAULT);
+  $('buyModal').hidden=false;SFX.click();$('buyGo').focus()}
+ const buyClose=()=>{$('buyModal').hidden=true;buyThen=null};
+ const buyDone=()=>{const f=buyThen;buyClose();renderLobby();f&&f()};
+ $('buyRange').oninput=e=>buyShow(valOf(+e.target.value),true);
+ document.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>buyShow(+b.dataset.buy));
+ $('buyGo').onclick=()=>{const v=buyPick;setK('start',v);try{localStorage.setItem('gs.lastStart',String(v))}catch(e){}
+  balance=v;bets={};setK('wallet',v);setK('walletAt',Date.now());saveWallet();buyDone()};
+ $('buyKeep').onclick=buyDone;
+ $('buyClose').onclick=buyClose;
+ $('buyModal').addEventListener('click',e=>{if(e.target===$('buyModal'))buyClose()});
+ addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('buyModal').hidden)buyClose()});
+ $('soloBtn').onclick=()=>{if(!canSit())return;askBankroll(TIERS[pickedTier],()=>{setTier(pickedTier);balance=loadWallet();bets={};render();$('lobby').hidden=true;
+  message(`${TIER().name}: ${fmt(TIER().min).replace('.00','')}–${limit(TIER().max)} per spot. Pick a chip, tap a spot, then Deal.`)})};
+ $('createBtn').onclick=()=>{if(!canSit())return;askBankroll(TIERS[pickedTier],()=>connect({t:'create',name:myName(),tier:pickedTier,bankroll:loadWallet(),open:$('openChk').checked}))};
+ $('joinBtn').onclick=()=>{const code=codeIn.value.trim().toUpperCase();if(code.length!==4){$('lobbyErr').textContent='Enter the 4-letter table code.';return}askBankroll(null,()=>connect({t:'join',code,name:myName(),bankroll:loadWallet()}))};
  $('lobbyBtn').onclick=()=>{if(round){message('Finish this hand first.');return}
   balance+=Object.values(bets).reduce((a,b)=>a+b,0);bets={};saveWallet();render();$('lobbyErr').textContent='';renderLobby();$('lobby').hidden=false};
  codeIn.addEventListener('keydown',e=>{if(e.key==='Enter')$('joinBtn').click()});
- $('leaveBtn').onclick=()=>{if(round&&NET.ws&&NET.ws.readyState===1&&!NET.room){message('Finish this hand first.');return}NET.leaving=true;saveWallet();try{NET.ws&&NET.ws.close()}catch(e){}location.reload()};
+ // ---- rejoin the table you were at (it keeps going while any friend is still there) ----
+ function lastTable(){try{return sessionStorage.getItem('gs.lastCode')||localStorage.getItem('gs.lastCode')||''}catch(e){return ''}}
+ function showRejoin(on){const b=$('rejoinBtn'),c=lastTable();b.hidden=!(on&&c);if(c)b.textContent=`Rejoin table ${c}`}
+ $('rejoinBtn').onclick=()=>{const c=lastTable();if(!c)return;codeIn.value=c;$('joinBtn').click()};
+ let leaveArmed=0;
+ $('leaveBtn').onclick=()=>{const staked=!!round&&Object.values(bets).some(v=>v>0);
+  if(staked&&Date.now()>leaveArmed){leaveArmed=Date.now()+5000;$('leaveBtn').textContent='Tap again to leave';
+   message('Leaving now gives up your bets on this hand. Tap Leave again within 5 seconds to go.');
+   setTimeout(()=>{if(Date.now()>=leaveArmed)$('leaveBtn').textContent='Leave table'},5100);return}
+  if(staked)bets={};   // the bets in play stay on the table
+  NET.leaving=true;saveWallet();try{NET.ws&&NET.ws.close()}catch(e){}location.reload()};
  $('copyCode').onclick=async()=>{const t=`Join my baccarat table — code ${NET.code}`;
   const how=ON_PAGE?' Invite each friend by email from this page\'s Share menu first; they must be signed in to Claude.':'';
   try{await navigator.clipboard.writeText(NET.code);message(`Table code ${NET.code} copied. Friends open this same game, tap Join and enter it.${how}`)}

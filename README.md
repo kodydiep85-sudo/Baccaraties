@@ -42,13 +42,25 @@ On the claude.ai page, friends tables use the page's built-in live room and need
 
 ## Table rules
 
+- **Bankroll:** before you sit down, a pop-up asks how much you want to play with. You get exactly that amount.
+  Each player name has its own chips, so friends sharing a computer never mix them up.
 - **Ready:** the dealer deals the moment everyone at the table taps Ready (or Skip hand).
   Anyone not ready when the one-minute clock runs out sits that hand out and gets their bet back.
 - **Who peels:** the biggest Player bettor squeezes the Player cards, and the biggest Banker bettor squeezes the Banker cards.
   Ties go to side bets, then to whoever bet first. A side nobody bet on is turned by the dealer.
 - **Order:** the Player side is peeled first. Banker cards stay put until every Player card is open.
+- **Hidden cards:** you can't see another player's cards, or watch their squeeze, until the hand is over.
+- **Leaving and rejoining:** leave any time (mid-hand, your bets on that hand stay on the table).
+  A **Rejoin** button takes you back. On claude.ai, if the player who started the table leaves, a friend takes over dealing
+  and the table keeps going.
+- **New shoe:** when the shoe runs low, a fresh eight-deck shoe is shuffled automatically and the roadmap starts over.
+- **Roadmap:** Panda 8 and Dragon 7 hands get their own icons; winning naturals show their 8 or 9 in a gold ring.
+- **Tables:** Lounge $10–$500 · High Limit $25–$5,000 · VIP Salon $100–$25,000 · Private Room $1,000–$100,000 ·
+  Diamond Room $10,000–$1T (chips up to $1T). Panda 8 and Dragon 7 have no maximum.
 - **Payouts:** Player 1:1 · Banker 1:1, no commission (Banker winning with a three-card 7 pushes) · Tie 8:1 ·
   Panda 8 25:1 · Dragon 7 40:1 · 9 over 7 25:1 · Pairs 11:1.
+- **How often:** over 3,000 simulated shoes (about 81 hands each), Dragon 7 hit 2.26% of hands (about 1.8 per shoe)
+  and Panda 8 hit 3.47% (about 2.8 per shoe), matching the published odds for 8-deck baccarat.
 
 ## Before publishing to the App Store
 
