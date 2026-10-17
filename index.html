@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<!-- Online table server. server.js fills this in by itself when it hosts the page; set it (wss://…/ws) for other hosts and the store apps. -->
+<!-- Online table server. Leave empty when the server also hosts this page; set it (wss://…/ws) for the store apps. -->
 <meta name="gs-server" content="">
 <meta name="theme-color" content="#140608">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -390,8 +390,6 @@ button.chipg{width:50px;height:50px;transition:transform .12s}
 .royal{position:absolute;left:21%;right:21%;top:8%;bottom:8%}.royal svg{display:block;width:100%;height:100%}
 .card.down .idx{display:none}
 .card.down.opp{cursor:pointer}.card.down.opp .face{animation:oppGlow 1.8s ease-in-out infinite}
-.card.sealed::after{content:"OPENED";position:absolute;left:50%;bottom:-.9em;transform:translateX(-50%);z-index:3;padding:.15em .6em;border-radius:1em;
- font:800 .62em system-ui,sans-serif;letter-spacing:.12em;color:#2a1405;background:#f0c64e;box-shadow:0 2px 4px #0008;white-space:nowrap}
 @keyframes oppGlow{50%{box-shadow:0 0 0 3px #ffffffcc,0 0 12px #fff8,0 4px 10px #001b12b0}}
 
 @media(max-width:900px){body:not(.rotated) .stage{flex-direction:column;gap:10px}
@@ -1137,8 +1135,6 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
  }
  // online: the Player side is peeled first; Banker cards stay put until every Player card is open
  const waitTurn=c=>NET.on&&round&&c.side==='banker'&&round.deal.some(x=>x.side==='player'&&!x.up);
- // online: cards another player squeezes stay face down for everyone else until the hand is paid
- const hiddenFromMe=c=>NET.on&&round&&!round.settling&&round.squeezer&&!!round.squeezer[c.side]&&round.squeezer[c.side]!==NET.me;
  const zoneOn=()=>$('zone').classList.toggle('on',$('zoneCards').children.length>0);
  // the dealer slides every face-down card on your side over to you
  function giveCards(){
@@ -1307,8 +1303,7 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
   return c;
  }
  function updateScores(){
-  for(const side of ['player','banker']){const up=table[side].filter(c=>c.up&&!c.sealed);
-   $(side+'Score').textContent=table[side].some(c=>c.sealed)?'?':up.length?total(up):'—'}
+  for(const side of ['player','banker']){const up=table[side].filter(c=>c.up);$(side+'Score').textContent=up.length?total(up):'—'}
  }
 
  /* ---------- betting UI ---------- */
@@ -1553,19 +1548,12 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
    if(bankerDraws(b,v)){round.stage='bThird';msg=`Banker has ${b} and must draw a third card.`}
    else{round.stage='done';msg=`Banker has ${b} and stands.`}
   }else round.stage='done';
-  return round.deal.some(c=>c.sealed)?'':msg;   // no hints about cards you can't see yet
+  return msg;
  }
  function finalize(c){
   if(!round||c.up||!round.deal.includes(c))return;
   SFX.snap();
   if(NET.on&&!c.remote)NET.send({t:'reveal',i:c.i}); // tell the table you turned it
-  if(c.remote&&hiddenFromMe(c)){   // opened by its squeezer: you see it when the hand ends
-   c.up=true;c.landed=true;c.sealed=true;c.peel=null;renderPeel(c);c.el.classList.remove('dragging');c.el.classList.add('sealed');
-   updateScores();checkProgress();
-   message(`${pname(round.squeezer[c.side])} opened a ${name(c.side)} card — you'll see it when the hand ends.`);
-   setButton();afterStage();
-   const r=round;setTimeout(()=>{if(round===r){giveCards();setButton()}},450);   // your side may be up next
-   return}
   c.up=true;c.landed=true;c.el.classList.remove('down','dragging');c.el.classList.add('up');updateScores();
   const extra=checkProgress();
   message(`${name(c.side)} card: ${cardLabel(c)}. ${extra}`.trim());
@@ -1684,9 +1672,8 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
  const NET={betHold:0,on:false,ws:null,me:null,code:null,players:[],phase:'betting',ready:false,countdownEnds:null,
   send(m){if(this.ws&&(this.ws.readyState===1||this.room))this.ws.send(JSON.stringify(m))}};
  const serverURL=()=>{const meta=document.querySelector('meta[name="gs-server"]'),v=meta&&meta.content.trim();
-  if(v&&v!=='same')return v;
-  // "same": the table server is hosting this page. Anywhere else with no address set, there's no server to reach.
-  if(v==='same'&&/^https?:/.test(location.protocol))return (location.protocol==='https:'?'wss://':'ws://')+location.host+'/ws';return null};
+  if(v)return v;if(/\.github\.io$/i.test(location.hostname))return null;   // GitHub Pages has no table server: set gs-server above to use one
+  if(/^https?:/.test(location.protocol))return (location.protocol==='https:'?'wss://':'ws://')+location.host+'/ws';return null};
  const pname=id=>{const p=NET.players.find(x=>x.id===id);return p?(id===NET.me?'You':p.name):'Dealer'};
  function squeezerNames(){if(!round||!round.squeezer)return '';const out=[];
   for(const s of ['player','banker']){const id=round.squeezer[s];if(id&&id!==NET.me&&round.deal.some(c=>c.side===s&&!c.up))out.push(`${pname(id)} is`)}
@@ -1774,8 +1761,7 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
  // a card someone else turned (or the dealer turned) — show it turning over here too
  function remoteReveal(c){
   if(c.up)return;c.remote=true;
-  const go=()=>{if(hiddenFromMe(c)){c.anim=false;finalize(c);return}
-   if(c.peel&&c.frac>.01)revealFully(c,380);else{c.anim=true;
+  const go=()=>{if(c.peel&&c.frac>.01)revealFully(c,380);else{c.anim=true;
    const half=180,tf=c.el.animate([{transform:'none'},{transform:'perspective(700px) rotateY(90deg) scale(1.06)'}],{duration:half,easing:'ease-in'});
    tf.onfinish=()=>{c.anim=false;finalize(c);c.el.animate([{transform:'perspective(700px) rotateY(-90deg) scale(1.06)'},{transform:'none'}],{duration:half,easing:'ease-out'})}}};
   if(!c.landed)setTimeout(go,Math.max(0,c.landIn||0));else if(c.anim)setTimeout(()=>{if(!c.up)go()},450);else go();
@@ -1802,13 +1788,6 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
  }
  function settleOnline(m){
   if(!round)return;
-  round.settling=true;
-  const sealed=round.deal.filter(c=>c.sealed);
-  for(const c of sealed){c.sealed=false;c.el.classList.remove('sealed');
-   c.el.animate([{transform:'none'},{transform:'perspective(700px) rotateY(90deg) scale(1.06)'}],{duration:220,easing:'ease-in'}).onfinish=()=>{
-    c.el.classList.remove('down');c.el.classList.add('up');updateScores();
-    c.el.animate([{transform:'perspective(700px) rotateY(-90deg) scale(1.06)'},{transform:'none'}],{duration:220,easing:'ease-out'})}}
-  if(sealed.length)SFX.snap();
   for(const c of round.deal)if(!c.up){c.remote=true;c.anim=false;finalize(c)}
   round.deal.forEach(c=>takeBack(c,true));
   const nm={P:'PLAYER',B:'BANKER',T:'TIE'}[m.result],mine=m.payouts[NET.me]||{gross:0,staked:0};
@@ -1823,12 +1802,10 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
   $('phase').textContent='Next hand soon';render();
   const winners=NET.players.filter(p=>p.id!==NET.me&&m.payouts[p.id]&&m.payouts[p.id].gross>m.payouts[p.id].staked).map(p=>`${p.name} +${fmt(m.payouts[p.id].gross-m.payouts[p.id].staked).replace('.00','')}`);
   message((mine.staked?(mine.gross>0?`${nm} wins — you got back ${fmt(mine.gross)}.`:`${nm} wins — no payout for you this hand.`):`${nm} wins.`)+(mine.bankerPush?' Banker bet pushes on the three-card 7.':'')+(winners.length?` Also winning: ${winners.join(', ')}.`:''));
-  const showBanner=()=>{
   const bn=$('banner');bn.innerHTML=`<b>${nm} ${m.result==='T'?'':'WINS'} ${m.p}–${m.b}</b><span class="${mine.gross>0?'':'lose'}">${mine.staked?(mine.gross>0?'+'+fmt(mine.gross):'No win this hand'):'Place a bet to join the next hand'}</span>`;
   bn.classList.add('show');clearTimeout(bn.t);bn.t=setTimeout(()=>bn.classList.remove('show'),2800);
   if(m.dragon&&onDragon){SFX.dragon();FX.dragon()}else if(m.panda&&onPanda){SFX.panda();FX.panda()}
-  setTimeout(()=>SFX.result(mine.gross||0,mine.staked||0),m.dragon&&onDragon?2300:m.panda&&onPanda?900:120);};
-  if(sealed.length)setTimeout(showBanner,550);else showBanner();   // let the hidden cards flip over first
+  setTimeout(()=>SFX.result(mine.gross||0,mine.staked||0),m.dragon&&onDragon?2300:m.panda&&onPanda?900:120);
  }
  function abortRound(msg){
   round=null;table={player:[],banker:[]};$('playerCards').innerHTML='';$('bankerCards').innerHTML='';$('zoneCards').innerHTML='';zoneOn();
@@ -1859,7 +1836,7 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
     $('peelBtn').disabled=true;const r=round;setTimeout(()=>{if(round===r){if(c.mine)giveCards();setButton()}},c.landIn+80);break;}
    case 'reveal':{if(!round)break;const c=round.deal.find(x=>x.i===m.i);if(c&&!c.up)remoteReveal(c);break;}
    case 'peel':{if(!round)break;const c=round.deal.find(x=>x.i===m.i);
-    if(c&&!c.up&&!c.mine&&!c.anim&&!hiddenFromMe(c))glidePeel(c,m);break;}
+    if(c&&!c.up&&!c.mine&&!c.anim)glidePeel(c,m);break;}
    case 'squeezer':if(round){round.squeezer[m.side]=m.id;for(const c of round.deal)if(c.side===m.side&&!c.up){c.mine=m.id===NET.me;c.canTap=false;c.el.classList.toggle('mine',c.mine);c.el.classList.remove('opp');c.el.classList.toggle('watch',!c.mine)}giveCards();setButton();renderPlayers()}break;
    case 'result':settleOnline(m);break;
    case 'shuffle':SFX.riffle();nudge('NEW SHOE · SHUFFLED');message('The shoe is finished — the dealer shuffles a fresh eight-deck shoe.');break;
@@ -2155,7 +2132,7 @@ body.rotated .fx{inset:auto;top:0;left:var(--vw,100vw);width:var(--vh,100vh);hei
  function lastTable(){try{return sessionStorage.getItem('gs.lastCode')||localStorage.getItem('gs.lastCode')||''}catch(e){return ''}}
  function showRejoin(on){const b=$('rejoinBtn'),c=lastTable();b.hidden=!(on&&c);if(c)b.textContent=`Rejoin table ${c}`}
  $('rejoinBtn').onclick=()=>{const c=lastTable();if(!c)return;codeIn.value=c;$('joinBtn').click()};
- let leaveArmed=0;
+let leaveArmed=0;
  $('leaveBtn').onclick=()=>{const staked=!!round&&Object.values(bets).some(v=>v>0);
   if(staked&&Date.now()>leaveArmed){leaveArmed=Date.now()+5000;$('leaveBtn').textContent='Tap again to leave';
    message('Leaving now gives up your bets on this hand. Tap Leave again within 5 seconds to go.');

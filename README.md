@@ -47,9 +47,9 @@ On the claude.ai page, friends tables use the page's built-in live room and need
 - **Ready:** the dealer deals the moment everyone at the table taps Ready (or Skip hand).
   Anyone not ready when the one-minute clock runs out sits that hand out and gets their bet back.
 - **Who peels:** the biggest Player bettor squeezes the Player cards, and the biggest Banker bettor squeezes the Banker cards.
-  Ties go to side bets, then to whoever bet first. A side nobody bet on is turned by the dealer.
-- **Order:** the Player side is peeled first. Banker cards stay put until every Player card is open.
-- **Hidden cards:** you can't see another player's cards, or watch their squeeze, until the hand is over.
+  Ties go to side bets, then to whoever bet first. Only the squeezer can touch those cards; everyone watches the squeeze.
+  A side nobody bet on is turned over by the dealer.
+- **Order:** the Player side is opened first. Banker cards stay put until every Player card is open.
 - **Leaving and rejoining:** leave any time (mid-hand, your bets on that hand stay on the table).
   A **Rejoin** button takes you back. On claude.ai, if the player who started the table leaves, a friend takes over dealing
   and the table keeps going.
