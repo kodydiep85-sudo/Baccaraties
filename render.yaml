@@ -1,0 +1,11 @@
+# Render Blueprint for Grand Squeeze Baccarat.
+# One web service: it serves the game and runs the friends tables at /ws.
+services:
+  - type: web
+    name: grand-squeeze
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /healthz
+    autoDeploy: true

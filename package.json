@@ -1,0 +1,13 @@
+{
+  "name": "grand-squeeze-baccarat",
+  "version": "1.0.0",
+  "description": "Squeeze-style baccarat with friends tables. Virtual chips only.",
+  "main": "server.js",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
